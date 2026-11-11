@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DesignGate ICT</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: project bar → 5-phase stepper (TIA-598 fiber colour code 1–5) → checklist | sticky outcome panel → comment register → knowledge base */
+:root{
+  --bg:#f1f4f7; --surface:#ffffff; --surface2:#f7f9fb; --ink:#15202b; --muted:#5a6876; --line:#d8dee5; --accent:#1f5fa8;
+  --f1:#2563c9; --f2:#d9701a; --f3:#24894f; --f4:#86562f; --f5:#66778a;
+  --crit:#c22d2d; --major:#b4740c; --minor:#4b6a88; --ok:#1f7f4a;
+  --crit-bg:#fbe9e9; --major-bg:#fbf1df; --minor-bg:#e8eef4; --ok-bg:#e4f3ea;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1319; --surface:#161d25; --surface2:#1b232d; --ink:#e4e9ee; --muted:#93a0ad; --line:#2a3440; --accent:#6ea6ea;
+  --f1:#5b93ee; --f2:#f0954a; --f3:#4fbf7f; --f4:#c08a5c; --f5:#9aabbd;
+  --crit:#ff7070; --major:#efab45; --minor:#90b1d0; --ok:#55c487;
+  --crit-bg:#3a1d1f; --major-bg:#382b14; --minor-bg:#1f2b38; --ok-bg:#16301f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1319; --surface:#161d25; --surface2:#1b232d; --ink:#e4e9ee; --muted:#93a0ad; --line:#2a3440; --accent:#6ea6ea;
+  --f1:#5b93ee; --f2:#f0954a; --f3:#4fbf7f; --f4:#c08a5c; --f5:#9aabbd;
+  --crit:#ff7070; --major:#efab45; --minor:#90b1d0; --ok:#55c487;
+  --crit-bg:#3a1d1f; --major-bg:#382b14; --minor-bg:#1f2b38; --ok-bg:#16301f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:24px;font-weight:800}
+h2{font-size:17px;font-weight:700}
+h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 12px;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn.small{padding:3px 8px;font-size:12px}
+input[type=text],input[type=number],input[type=date],select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:5px 8px;min-width:0;width:100%}
+textarea{resize:vertical}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.brand{display:flex;gap:12px;align-items:center}
+.mark{width:40px;height:40px;border-radius:8px;display:grid;grid-template-columns:repeat(5,1fr);overflow:hidden;flex-shrink:0}
+.mark span:nth-child(1){background:var(--f1)}.mark span:nth-child(2){background:var(--f2)}.mark span:nth-child(3){background:var(--f3)}.mark span:nth-child(4){background:var(--f4)}.mark span:nth-child(5){background:var(--f5)}
+.tag{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.tag.sample{border-color:var(--major);color:var(--major)}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+
+.proj{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:10px}
+.proj label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;min-width:0}
+.proj input{text-transform:none;letter-spacing:0;font-weight:400;font-size:14px;color:var(--ink)}
+
+/* stepper */
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.step{position:relative;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 12px 10px 16px;display:flex;flex-direction:column;gap:3px;overflow:hidden;min-width:0}
+.step::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--pc)}
+.step[aria-pressed="true"]{border-color:var(--pc);box-shadow:inset 0 0 0 1px var(--pc)}
+.step .n{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.step .nm{font-family:var(--display);font-weight:700;font-size:14px}
+.step .dp{font-size:12px;color:var(--muted)}
+.step .sc{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px}
+.meter{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--pc)}
+
+/* main grid */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.side{position:sticky;top:max(12px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:18px}
+.phasehead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+.focus{font-size:13px;color:var(--muted);max-width:70ch}
+.legend{display:flex;flex-wrap:wrap;gap:6px}
+
+/* checklist */
+.cat{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.cat>header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface2);gap:8px}
+.cat>header h3{color:var(--ink)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:10px 12px;border-top:1px solid var(--line);align-items:start}
+.row .chk{display:flex;flex-direction:column;gap:3px;min-width:0}
+.row .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.row .ref{font-family:var(--mono);font-size:11.5px}
+.row .note{grid-column:1/-1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex-shrink:0}
+.seg button{border:0;background:var(--surface);padding:5px 10px;font-size:12px;font-weight:600;color:var(--muted);min-width:40px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[data-v="Y"][aria-pressed="true"]{background:var(--ok-bg);color:var(--ok)}
+.seg button[data-v="N"][aria-pressed="true"]{background:var(--crit-bg);color:var(--crit)}
+.seg button[data-v="NA"][aria-pressed="true"]{background:var(--minor-bg);color:var(--minor)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;white-space:nowrap;letter-spacing:.02em}
+.pill.Critical{background:var(--crit-bg);color:var(--crit)}
+.pill.Major{background:var(--major-bg);color:var(--major)}
+.pill.Minor{background:var(--minor-bg);color:var(--minor)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.ty{font-family:var(--mono);font-size:10.5px;font-weight:500;padding:1px 6px;border-radius:3px;border:1px solid currentColor;white-space:nowrap}
+.ty.CMD{color:var(--crit)}.ty.HL{color:var(--major)}.ty.REC{color:var(--accent)}
+.custom{font-size:10.5px;color:var(--f3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+/* metrics */
+.mtable{width:100%;border-collapse:collapse;font-size:13px}
+.mtable th{text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+.mtable td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.mtable td.v{width:140px}
+.mtable td.r{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.tw{overflow-x:auto;min-width:0}
+.res{font-size:12px;font-weight:600}
+.res.ok{color:var(--ok)}.res.bad{color:var(--crit)}.res.warn{color:var(--major)}
+
+/* tools */
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.calc label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+.calcout{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.kv{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kv span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.kv b{font-family:var(--mono);font-size:16px;font-weight:500}
+.etable{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+.etable th{text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px;border-bottom:1px solid var(--line);font-weight:600}
+.etable td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.etable input,.etable select{padding:4px 6px;font-size:13px}
+
+/* outcome */
+.outcome{border-top:5px solid var(--pc)}
+.ringrow{display:flex;gap:16px;align-items:center}
+.ring{width:120px;height:120px;flex-shrink:0}
+.ring text{fill:var(--ink);font-family:var(--mono)}
+.decision{display:flex;flex-direction:column;gap:4px;min-width:0}
+.code{font-family:var(--display);font-weight:800;font-size:22px;line-height:1.1}
+.code.A{color:var(--ok)}.code.B{color:var(--major)}.code.C{color:var(--crit)}.code.I{color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:110px minmax(0,1fr) 42px;gap:8px;align-items:center;font-size:12px}
+.bar .t{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:4px}
+.bar .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stack{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line)}
+.stack i{display:block;height:100%}
+
+/* register */
+.reg{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+.reg th{text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:7px 8px;border-bottom:1px solid var(--line);font-weight:600;background:var(--surface2)}
+.reg td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.reg td.no{font-family:var(--mono);font-size:12px;white-space:nowrap}
+.reg tr.Critical td:first-child{box-shadow:inset 3px 0 0 var(--crit)}
+.reg tr.Major td:first-child{box-shadow:inset 3px 0 0 var(--major)}
+.reg tr.Minor td:first-child{box-shadow:inset 3px 0 0 var(--minor)}
+.fb{display:flex;gap:4px}
+.fb button{border:1px solid var(--line);background:var(--surface);border-radius:4px;font-size:11px;padding:2px 6px;color:var(--muted)}
+.fb button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filters button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12px}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+.kbgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.form label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+.form .full{grid-column:1/-1}
+.list{display:flex;flex-direction:column;gap:6px;font-size:13px;margin:0;padding:0;list-style:none}
+.list li{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.toast{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);padding:8px 14px;border-radius:6px;font-size:13px;z-index:20}
+.explain{font-size:12.5px;color:var(--muted);max-width:75ch}
+details summary{cursor:pointer;font-weight:600}
+
+@media (max-width:1060px){.grid{grid-template-columns:minmax(0,1fr)}.side{position:static}.kbgrid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.proj{grid-template-columns:repeat(2,minmax(0,1fr))}.proj label:first-child{grid-column:1/-1}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.calc,.calcout{grid-template-columns:repeat(2,minmax(0,1fr))}.row{grid-template-columns:minmax(0,1fr)}.form{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <div>
+        <h1>DesignGate ICT</h1>
+        <div class="muted" style="font-size:13px">Telecom &amp; ICT engineering design review · 5 project phases · rules MVP</div>
+      </div>
+      <span class="tag sample" id="sampleTag">Sample data</span>
+    </div>
+    <div class="actions">
+      <button class="btn" id="btnSample">Load sample project</button>
+      <button class="btn" id="btnBlank">New blank review</button>
+      <button class="btn primary" id="btnSave">Save review snapshot</button>
+    </div>
+  </header>
+
+  <section class="panel" aria-label="Project">
+    <div class="proj">
+      <label>Project<input type="text" id="p_name" data-p="name"></label>
+      <label>Project no.<input type="text" id="p_no" data-p="no"></label>
+      <label>Document / Rev<input type="text" id="p_doc" data-p="doc"></label>
+      <label>Reviewer<input type="text" id="p_rev" data-p="reviewer"></label>
+      <label>Review date<input type="date" id="p_date" data-p="date"></label>
+    </div>
+  </section>
+
+  <nav class="steps" id="steps" aria-label="Project phases"></nav>
+
+  <div class="grid">
+    <div class="col">
+      <section class="panel" id="checklist"></section>
+      <section class="panel" id="metrics"></section>
+      <section class="panel" id="tool"></section>
+    </div>
+    <aside class="side">
+      <section class="panel outcome" id="outcome"></section>
+    </aside>
+  </div>
+
+  <section class="panel" id="register"></section>
+
+  <section class="panel" id="kb"></section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ============================================================
+   KNOWLEDGE BASE (rules). Standards are cited by document name;
+   reviewers must confirm the edition adopted by the AHJ / contract.
+   Sev: Critical | Major | Minor.  Type: CMD (shall/mandatory) | HL (highlight/risk) | REC (recommendation/should)
+   ============================================================ */
+const I=(id,cat,check,ref,sev,type,action)=>({id,cat,check,ref,sev,type,action});
+const PHASES=[
+{key:'sc',pfx:'SC',n:1,name:'Scoping (DBSP)',long:'Design Basis Scoping Paper',depth:'High-level review',fiber:'Blue',color:'var(--f1)',threshold:70,gate:'Proceed to proposal',
+ focus:'Confirms the design basis: owner requirements, applicable standards, systems in scope, space allocation and risk. No calculations are expected at this stage.',
+ items:[
+ I('sc01','Requirements','Owner project requirements (OPR) for ICT documented and signed off','BICSI TDMM — design process; PMI PMBOK requirements','Major','HL','Obtain OPR sign-off and attach the requirements list to the DBSP.'),
+ I('sc02','Requirements','Stakeholders and authority having jurisdiction (AHJ) identified','PMI PMBOK — stakeholder register','Minor','REC','Add a stakeholder register including AHJ, owner IT, security and facilities.'),
+ I('sc03','Standards basis','Codes & standards register lists TIA-568 series, TIA-569, TIA-606, TIA-607, NFPA 70 and local amendments','ANSI/TIA-568.0; NFPA 70 (NEC); local AHJ','Critical','CMD','Issue a standards register with document numbers and adopted editions before proposal.'),
+ I('sc04','Standards basis','Data centre / critical space availability target stated (Rated level or Class)','ANSI/TIA-942; ANSI/BICSI 002','Major','HL','State the target availability level and its cost implications for the owner to confirm.'),
+ I('sc05','Systems scope','Systems inventory defined: cabling, Wi-Fi, DAS/ERRCS, CCTV, access control, AV, BMS, PA','BICSI TDMM — systems integration','Major','HL','Complete the systems inventory and confirm in/out of scope per system.'),
+ I('sc06','Site & spaces','Entrance facility with diverse service-provider routes considered','ANSI/TIA-569; ANSI/TIA-758','Major','REC','Show two physically diverse building entrances or record the accepted risk.'),
+ I('sc07','Site & spaces','Equipment room and at least one telecom room per floor allocated','ANSI/TIA-569','Major','CMD','Allocate an ER and at least one TR per floor on the space plan.'),
+ I('sc08','Site & spaces','Site survey / existing conditions captured','BICSI TDMM — site survey','Minor','REC','Carry out and attach a site survey (pathways, existing OSP, spaces).'),
+ I('sc09','Risk & budget','Growth and spare-capacity assumption stated','BICSI TDMM','Minor','REC','State the growth allowance (e.g. % spare ports, strands, pathway fill).'),
+ I('sc10','Risk & budget','Budget estimate class and contingency stated','AACE RP 18R-97','Minor','HL','State estimate class (typically Class 5 at scoping) and contingency %.'),
+ I('sc11','Risk & budget','Risk and assumptions log started','PMI PMBOK — risk register','Minor','HL','Open a risk register; record top 5 technical and schedule risks.')],
+ metrics:[
+ {k:'reqCov',label:'OPR items mapped to scope',unit:'%',ref:'PMI PMBOK traceability',rule:v=>v<60?R('CMD','Major',`Only ${v}% of OPR items are mapped to scope.`,'Complete the requirements trace before the proposal phase.'):v<80?R('HL','Minor',`${v}% of OPR items mapped; target is ≥ 80% at scoping.`,'Close the remaining requirement gaps or record them as assumptions.'):null},
+ {k:'stdCount',label:'Codes/standards listed in basis',unit:'count',ref:'ANSI/TIA-568.0',rule:v=>v<5?R('HL','Major',`Standards register lists ${v} documents.`,'List at least TIA-568, -569, -606, -607, NFPA 70 and AHJ amendments.'):null},
+ {k:'area',label:'Largest floor plate',unit:'m²',ref:'ANSI/TIA-569',rule:null},
+ {k:'trs',label:'TRs planned on that floor',unit:'count',ref:'ANSI/TIA-569',rule:(v,m)=>{const need=Math.max(1,Math.ceil((+m.area||0)/1000));return v<need?R('CMD','Major',`Floor of ${m.area} m² has ${v} TR(s); ${need} needed at ≤ 1,000 m² served per TR.`,'Add telecom rooms or confirm the served area per TR ≤ 1,000 m².'):null}},
+ {k:'assume',label:'Open assumptions',unit:'count',ref:'PMI PMBOK',rule:v=>v>10?R('HL','Minor',`${v} open assumptions at scoping.`,'Validate or close assumptions with the owner before proposal.'):null}]},
+
+{key:'pr',pfx:'PR',n:2,name:'Proposal',long:'Concept / proposal design',depth:'Light review, still high-level',fiber:'Orange',color:'var(--f2)',threshold:75,gate:'Proceed to detailed design',
+ focus:'Checks the concept: topology, media selection, TR reach, pathway and grounding concept, integration matrix and commercial basis.',
+ items:[
+ I('pr01','Concept & topology','Hierarchical star topology defined (MC → IC → HC)','ANSI/TIA-568.0; ANSI/TIA-568.1','Major','CMD','Show the hierarchical star on a riser concept diagram.'),
+ I('pr02','Concept & topology','TR locations give ≤ 90 m horizontal reach to every work area','ANSI/TIA-568.1; ISO/IEC 11801-1','Critical','CMD','Relocate or add TRs so every outlet is within 90 m route length.'),
+ I('pr03','Media','Horizontal category selected and justified (Cat 6A for Wi-Fi APs)','TIA TSB-162-A; ANSI/TIA-568.2','Major','REC','Select Cat 6A for AP and PoE-dense outlets; record the justification.'),
+ I('pr04','Media','Backbone media and strand counts stated (OS2 / OM4) incl. spare','ANSI/TIA-568.3','Minor','REC','State fibre type, strand count and spare per backbone segment.'),
+ I('pr05','Spaces & pathways','Pathway concept stated (tray, conduit, J-hooks, risers)','ANSI/TIA-569','Minor','HL','Add a pathway concept sketch for horizontal and riser routes.'),
+ I('pr06','Spaces & pathways','Grounding & bonding concept (TMGB, TGBs, TBB) included','ANSI/TIA-607','Major','CMD','Add the bonding concept diagram showing TMGB, TGBs and TBB.'),
+ I('pr07','Spaces & pathways','Power and cooling allowance for ER/TRs stated','ANSI/TIA-569; ASHRAE TC 9.9','Major','HL','State kW per rack and cooling basis; coordinate with MEP.'),
+ I('pr08','Integration','Low-voltage integration matrix drafted (who connects to what)','BICSI TDMM — systems integration','Major','HL','Issue the integration matrix: system, interface, owner, network segment.'),
+ I('pr09','Commercial','Cost estimate with stated class and basis','AACE RP 18R-97','Minor','HL','Advance estimate to Class 4/3 and state the basis.'),
+ I('pr10','Commercial','Schedule milestones and long-lead items listed','PMI PMBOK — schedule','Minor','REC','List long-lead items (e.g. switches, OSP materials) with lead times.'),
+ I('pr11','Compliance','Draft compliance matrix against DBSP requirements','PMI PMBOK traceability','Major','HL','Issue a compliance matrix: requirement → design response → status.')],
+ metrics:[
+ {k:'trace',label:'DBSP requirements traced',unit:'%',ref:'PMI PMBOK traceability',rule:v=>v<70?R('CMD','Major',`Only ${v}% of DBSP requirements traced.`,'Complete traceability before detailed design.'):v<90?R('HL','Major',`${v}% traced; target ≥ 90% at proposal.`,'Trace the remaining requirements in the compliance matrix.'):null},
+ {k:'maxRun',label:'Max estimated horizontal run',unit:'m',ref:'ANSI/TIA-568.1',rule:v=>v>90?R('CMD','Critical',`Estimated run of ${v} m exceeds the 90 m permanent-link limit.`,'Relocate/add TR or redesign the serving zone.'):v>80?R('HL','Minor',`Estimated run of ${v} m leaves < 10 m margin to the 90 m limit.`,'Allow for vertical drops and service loops at detailed design (project practice).'):null},
+ {k:'spare',label:'Spare backbone strands',unit:'%',ref:'Project practice',rule:v=>v<20?R('REC','Minor',`${v}% spare backbone strands.`,'Consider ≥ 20% spare strands (project practice, not a TIA requirement).'):null},
+ {k:'estClass',label:'Estimate class (AACE)',unit:'class',ref:'AACE RP 18R-97',input:'select',options:['5','4','3','2','1'],rule:v=>v==='5'?R('HL','Minor','Proposal estimate is still AACE Class 5.','Advance the estimate to Class 4 or better.'):null}]},
+
+{key:'dd',pfx:'DD',n:3,name:'Detailed design',long:'Detailed design / IFC package',depth:'Detailed review',fiber:'Green',color:'var(--f3)',threshold:85,gate:'Issue for construction',
+ focus:'Line-by-line review of drawings and specifications: link lengths, spaces, pathway fill and bends, bonding, labelling, PoE, cable ratings, firestopping and test requirements.',
+ items:[
+ I('dd01','Horizontal cabling','Every permanent link ≤ 90 m and channel ≤ 100 m','ANSI/TIA-568.1; ISO/IEC 11801-1','Critical','CMD','Re-run the distance schedule; relocate/add TR for any link > 90 m.'),
+ I('dd02','Horizontal cabling','Total patch/equipment cords ≤ 10 m per channel','ANSI/TIA-568.1','Major','CMD','Limit total cord length to 10 m in the specification.'),
+ I('dd03','Horizontal cabling','Minimum two outlets/permanent links per work area','ANSI/TIA-568.1','Major','CMD','Provide at least two outlets per work area on floor plans.'),
+ I('dd04','Horizontal cabling','Consolidation points ≥ 15 m from TR and serving ≤ 12 work areas','ANSI/TIA-568.1','Minor','CMD','Relocate CPs to ≥ 15 m from the TR; limit to 12 work areas each.'),
+ I('dd05','Horizontal cabling','Installation limits specified: bend radius ≥ 4× OD, pull tension ≤ 110 N (4-pair)','ANSI/TIA-568.2','Minor','REC','Add bend-radius and pulling-tension limits to the installation spec.'),
+ I('dd06','Backbone & fibre','Fibre link loss budget calculated per link','ANSI/TIA-568.3','Major','CMD','Provide a loss budget per backbone link (see calculator below).'),
+ I('dd07','Backbone & fibre','Fibre bend radius and pathway protection (innerduct) specified','ANSI/TIA-568.3; ANSI/TIA-569','Minor','REC','Specify bend radius per TIA-568.3/manufacturer and innerduct where required.'),
+ I('dd08','Spaces','TR count and size suit served area','ANSI/TIA-569','Major','CMD','Resize/add TRs per TIA-569 sizing guidance.'),
+ I('dd09','Spaces','TR dedicated: no unrelated piping, ducts or electrical equipment','ANSI/TIA-569','Major','CMD','Reroute water/drain piping away from TR; remove non-telecom equipment.'),
+ I('dd10','Spaces','Continuous HVAC and dedicated circuits/UPS for TR/ER','ANSI/TIA-569; ASHRAE TC 9.9','Major','HL','Coordinate 24/7 cooling and dedicated circuits with MEP.'),
+ I('dd11','Pathways','Conduit fill ≤ 40% for 3+ cables','NFPA 70 Ch. 9 Table 1; ANSI/TIA-569','Major','CMD','Upsize conduit or split cables to meet 40% fill.'),
+ I('dd12','Pathways','≤ two 90° bends (180°) and ≤ 30 m between pull points','ANSI/TIA-569','Major','CMD','Add pull boxes so each section has ≤ 180° bends and ≤ 30 m.'),
+ I('dd13','Pathways','Cable tray fill ≤ 50% of usable depth','ANSI/TIA-569','Minor','CMD','Upsize tray or add a second tray run.'),
+ I('dd14','Pathways','Separation from power and EMI sources shown','ANSI/TIA-569','Minor','HL','Show separation distances to power feeders, motors and transformers.'),
+ I('dd15','Grounding & bonding','TMGB/TGB and TBB (min. 6 AWG) sized and routed','ANSI/TIA-607','Critical','CMD','Size TBB per TIA-607 length table (min. 6 AWG) and show on riser.'),
+ I('dd16','Grounding & bonding','Racks, cabinets, tray and equipment bonded to TGB','ANSI/TIA-607','Major','CMD','Add rack/tray bonding details and conductor sizes.'),
+ I('dd17','Administration','Labelling scheme per TIA-606 class defined','ANSI/TIA-606','Major','CMD','Define TIA-606 class and identifier format for all elements.'),
+ I('dd18','PoE & power','PoE Type 3/4 loads identified; bundle heating considered','IEEE 802.3bt; TIA TSB-184-A','Major','HL','Identify Type 3/4 outlets and check bundle size/temperature per TSB-184-A.'),
+ I('dd19','Life safety','Cable listings (CMP/CMR/OFNP/LSZH) match the space','NFPA 70 Art. 770 & Ch. 8','Critical','CMD','Specify plenum-rated cable in air-handling spaces and riser-rated in shafts.'),
+ I('dd20','Life safety','Firestopping details for every rated penetration (listed systems)','IBC; UL 1479 / listed systems','Critical','CMD','Add listed firestop system details for each penetration type.'),
+ I('dd21','Documents','Drawing set complete: plans, riser, rack elevations, details, schedules','BICSI TDMM — construction documents','Major','CMD','Add missing sheets before IFC.'),
+ I('dd22','Documents','Specifications in CSI MasterFormat Div. 27 / 28','CSI MasterFormat','Minor','REC','Organise specs under Division 27 and 28.'),
+ I('dd23','Documents','Field test requirements specified (copper: Level IIIe+ tester; fibre: Tier 1 OLTS)','ANSI/TIA-1152; ANSI/TIA-568.3','Major','CMD','Add test parameters, tester accuracy level and acceptance criteria.')],
+ metrics:[
+ {k:'pl',label:'Longest permanent link',unit:'m',ref:'ANSI/TIA-568.1',rule:v=>v>90?R('CMD','Critical',`Longest permanent link is ${v} m (limit 90 m).`,'Reroute, relocate TR or add a TR for the affected outlets.'):null},
+ {k:'cords',label:'Total cords per channel',unit:'m',ref:'ANSI/TIA-568.1',rule:v=>v>10?R('CMD','Major',`Cords total ${v} m per channel (limit 10 m).`,'Reduce cord allowance in the specification.'):null},
+ {k:'fill',label:'Worst conduit fill',unit:'%',ref:'NFPA 70 Ch. 9 Table 1',rule:v=>v>40?R('CMD','Major',`Conduit fill ${v}% exceeds 40%.`,'Upsize conduit or split the cable group.'):null},
+ {k:'bends',label:'Max bends between pull points',unit:'°',ref:'ANSI/TIA-569',rule:v=>v>180?R('CMD','Major',`${v}° of bends between pull points (limit 180°).`,'Add a pull box to break the run.'):null},
+ {k:'tray',label:'Worst cable tray fill',unit:'%',ref:'ANSI/TIA-569',rule:v=>v>50?R('CMD','Minor',`Cable tray fill ${v}% exceeds 50%.`,'Upsize the tray or add a parallel run.'):null},
+ {k:'tbb',label:'TBB conductor size',unit:'AWG',ref:'ANSI/TIA-607',input:'select',options:['10','8','6','4','2','1/0','2/0','3/0'],rule:v=>(v==='10'||v==='8')?R('CMD','Critical',`TBB specified as ${v} AWG; minimum is 6 AWG.`,'Size the TBB per TIA-607 length table.'):null},
+ {k:'fiberMargin',label:'Fibre loss margin (from calculator)',unit:'dB',ref:'ANSI/TIA-568.3; IEEE 802.3',auto:true,rule:v=>v<0?R('CMD','Critical',`Fibre link exceeds the application loss budget by ${Math.abs(v).toFixed(2)} dB.`,'Reduce connector pairs/splices, shorten the link or change media.'):v<1?R('HL','Minor',`Fibre margin only ${v.toFixed(2)} dB.`,'Keep ≥ 1 dB margin for future repair splices (project practice).'):null}]},
+
+{key:'cn',pfx:'CN',n:4,name:'Construction',long:'Construction & installation',depth:'Field review: civils, catalogue, integration',fiber:'Brown',color:'var(--f4)',threshold:90,gate:'Proceed to testing & commissioning',
+ focus:'Verifies that submitted products match the specification, that civil/OSP works follow the drawings, and that the interfaces between systems are coordinated.',
+ items:[
+ I('cn01','Submittals & catalogue','Product data submittals approved before procurement','CSI MasterFormat Div. 01 — submittals','Major','CMD','Hold procurement until submittals are approved.'),
+ I('cn02','Submittals & catalogue','Submitted products match spec (category, listing, fibre type, connector)','Project specification Div. 27','Critical','CMD','Reject non-matching items; see catalogue match table.'),
+ I('cn03','Submittals & catalogue','Single-manufacturer certified system for channel warranty','Manufacturer warranty programme','Major','HL','Confirm all cabling components are within one warranty programme.'),
+ I('cn04','Submittals & catalogue','Installer certified by manufacturer; BICSI-credentialed supervision','BICSI ITS / RCDD credentials','Minor','REC','Request installer certificates and credential list.'),
+ I('cn05','Civils / OSP','Duct bank routes, sizes and spare ducts match drawings','ANSI/TIA-758','Major','CMD','Survey and record deviations; issue NCR for missing spare ducts.'),
+ I('cn06','Civils / OSP','Burial depth / concrete encasement per spec and AHJ','Project spec; AHJ; NFPA 70 300.5','Major','CMD','Verify cover depth before backfill; photograph with tape measure.'),
+ I('cn07','Civils / OSP','Maintenance holes/handholes sized and spaced; bends within limits','ANSI/TIA-758','Major','CMD','Add handhole or reduce bends where pull section limits are exceeded.'),
+ I('cn08','Civils / OSP','Separation from power and other utilities in trench','IEEE C2 (NESC); local utility rules','Major','CMD','Correct separation before backfill.'),
+ I('cn09','Civils / OSP','Ducts proven (mandrel), pull ropes left, entrance ducts sealed','ANSI/TIA-758','Minor','REC','Record mandrel test; seal ducts against water and gas.'),
+ I('cn10','Civils / OSP','Primary protectors on OSP copper at building entrance','NFPA 70 Ch. 8','Critical','CMD','Install listed primary protectors and bond to the TMGB.'),
+ I('cn11','Installation','Supports at ≤ 1.5 m intervals; tray/J-hooks per drawings','ANSI/TIA-569','Minor','CMD','Add supports where spacing exceeds 1.5 m.'),
+ I('cn12','Installation','Firestopping installed per listed system and inspected','IBC; listed systems','Critical','CMD','Stop work at open penetrations; inspect and record.'),
+ I('cn13','Installation','Bonding installed and continuity verified (TMGB → TGBs)','ANSI/TIA-607','Critical','CMD','Measure and record bonding continuity.'),
+ I('cn14','Systems integration','IP addressing / VLAN plan issued for CCTV, ACS, BMS, AV','Owner IT standards','Major','HL','Issue the IP/VLAN plan before device configuration.'),
+ I('cn15','Systems integration','PoE budget per switch checked against connected devices','IEEE 802.3bt','Major','CMD','Rebalance devices or upgrade PSU where budget is exceeded.'),
+ I('cn16','Systems integration','Fire alarm interfaces coordinated (door release, AV mute, elevator)','NFPA 72','Critical','CMD','Hold integrated testing until the interface matrix is approved.'),
+ I('cn17','Systems integration','OT/IoT device hardening: default credentials removed, segmentation','IEC 62443','Major','HL','Apply the hardening checklist before connecting devices to the network.'),
+ I('cn18','Change control','RFIs answered within the contract period','Contract conditions','Minor','HL','Escalate overdue RFIs.'),
+ I('cn19','Change control','Field changes recorded on redline drawings','BICSI TDMM — record documents','Major','CMD','Update redlines weekly; check at each site walk.')],
+ metrics:[
+ {k:'match',label:'Catalogue items matched (from table)',unit:'%',ref:'Project specification',auto:true,rule:null},
+ {k:'rfiOpen',label:'Open RFIs',unit:'count',ref:'Contract',rule:v=>v>0?R('HL','Minor',`${v} RFIs open.`,'Track to closure before testing.'):null},
+ {k:'rfiAge',label:'Average age of open RFIs',unit:'days',ref:'Contract (MVP default 10 d)',rule:v=>v>10?R('HL','Major',`Open RFIs average ${v} days.`,'Escalate; overdue RFIs drive field rework.'):null},
+ {k:'insp',label:'Inspections passed first time',unit:'%',ref:'Project QA plan',rule:v=>v<100?R('CMD','Major',`${v}% of inspections passed first time.`,'Close NCRs and re-inspect failed areas.'):null},
+ {k:'intTested',label:'Integration interfaces tested',unit:'%',ref:'Integration matrix',rule:v=>v<100?R('HL','Major',`${v}% of system interfaces tested.`,'Schedule the remaining interface tests before commissioning.'):null},
+ {k:'poe',label:'Worst switch PoE budget use',unit:'%',ref:'IEEE 802.3bt',rule:v=>v>100?R('CMD','Critical',`PoE demand is ${v}% of PSE budget.`,'Rebalance loads or add power supplies.'):v>80?R('REC','Minor',`PoE use at ${v}% of budget.`,'Keep ≥ 20% headroom (project practice).'):null}]},
+
+{key:'co',pfx:'CO',n:5,name:'Closeout',long:'Commissioning, as-built & closeout',depth:'Verification: all items must be Yes',fiber:'Slate',color:'var(--f5)',threshold:100,gate:'Accept & hand over',
+ focus:'Confirms that every test passed, as-builts and labels match, all punch items are closed and every design compliance item is answered Yes. Anything not verified is treated as open.',
+ items:[
+ I('co01','Testing','100% of copper permanent links pass (no marginal results)','ANSI/TIA-568.2; ANSI/TIA-1152','Critical','CMD','Repair and retest every failed or marginal link.'),
+ I('co02','Testing','100% fibre links pass Tier 1 (OLTS); Tier 2 (OTDR) where specified','ANSI/TIA-568.3; TIA-526-14; TIA-526-7','Critical','CMD','Clean/re-terminate and retest failed links.'),
+ I('co03','Testing','Test results delivered in native tester format','Project spec Div. 27','Major','CMD','Request native files, not only PDF summaries.'),
+ I('co04','Testing','Manufacturer system warranty certificate issued','Manufacturer warranty programme','Major','CMD','Hold final payment until the warranty is registered.'),
+ I('co05','Documentation','As-built drawings received and reviewed','BICSI TDMM — record documents','Critical','CMD','Return as-builts for correction; verify against site.'),
+ I('co06','Documentation','Labels on site match as-builts and records','ANSI/TIA-606','Major','CMD','Spot-check ≥ 10% of labels and correct mismatches.'),
+ I('co07','Documentation','O&M manuals, product data and spares handed over','Project spec Div. 01','Major','CMD','Issue the O&M package and spares inventory.'),
+ I('co08','Documentation','Cabling records / database handed over to owner','ANSI/TIA-606','Minor','REC','Hand over the records in the owner’s required format.'),
+ I('co09','Punch list','All punch items closed and verified','Project closeout procedure','Critical','CMD','Close remaining punch items (see tracker).'),
+ I('co10','Punch list','AHJ inspections and certificates closed','Local AHJ','Critical','CMD','Obtain the outstanding AHJ certificates.'),
+ I('co11','Design compliance','Design compliance matrix answered Yes for every item','PMI PMBOK — validate scope','Critical','CMD','Resolve every “No” or obtain an approved deviation.'),
+ I('co12','Design compliance','Deviations formally approved (waivers on file)','Contract change procedure','Major','CMD','File signed deviation approvals.'),
+ I('co13','Handover','Owner training delivered with attendance record','Project spec Div. 01','Minor','REC','Deliver training and file the attendance sheet.'),
+ I('co14','Handover','Lessons learned captured','PMI PMBOK — close project','Minor','REC','Run the lessons-learned session and add new checks to this tool.')],
+ metrics:[
+ {k:'cuPass',label:'Copper links passed',unit:'%',ref:'ANSI/TIA-568.2',rule:v=>v<100?R('CMD','Critical',`${v}% of copper links passed.`,'Repair and retest until 100% pass.'):null},
+ {k:'fiPass',label:'Fibre links passed',unit:'%',ref:'ANSI/TIA-568.3',rule:v=>v<100?R('CMD','Critical',`${v}% of fibre links passed.`,'Repair and retest until 100% pass.'):null},
+ {k:'asb',label:'As-built sheets received',unit:'%',ref:'Record documents',rule:v=>v<100?R('CMD','Critical',`${v}% of as-built sheets received.`,'Obtain the remaining as-built sheets.'):null},
+ {k:'punchOpen',label:'Open punch items (from tracker)',unit:'count',ref:'Closeout procedure',auto:true,rule:null},
+ {k:'matrix',label:'Compliance matrix answered Yes',unit:'%',ref:'PMI PMBOK',rule:v=>v<100?R('CMD','Critical',`${v}% of compliance items answered Yes.`,'Resolve or formally waive every remaining item.'):null},
+ {k:'warranty',label:'Warranty certificate issued',unit:'',ref:'Manufacturer',input:'select',options:['Yes','No'],rule:v=>v==='No'?R('CMD','Major','Warranty certificate not issued.','Register the system warranty before final acceptance.'):null}]}
+];
+function R(type,sev,finding,action){return{type,sev,finding,action}}
+const W={Critical:5,Major:3,Minor:1};
+const TYPE_NAME={CMD:'Command',HL:'Highlight',REC:'Recommendation'};
+const FIBER={OS2i:{n:'OS2 inside plant',att:1.0,m:'OS2'},OS2o:{n:'OS2 outside plant',att:0.5,m:'OS2'},OM4:{n:'OM4 @ 850 nm',att:3.5,m:'OM4'},OM3:{n:'OM3 @ 850 nm',att:3.5,m:'OM3'}};
+const APPS={sr3:{n:'10GBASE-SR (OM3)',m:'OM3',loss:2.6,reach:300},sr4:{n:'10GBASE-SR (OM4)',m:'OM4',loss:2.9,reach:400},sr40:{n:'40GBASE-SR4 (OM4)',m:'OM4',loss:1.5,reach:150},sr100:{n:'100GBASE-SR4 (OM4)',m:'OM4',loss:1.9,reach:100},lr:{n:'10GBASE-LR (OS2)',m:'OS2',loss:6.2,reach:10000},lr4:{n:'100GBASE-LR4 (OS2)',m:'OS2',loss:6.3,reach:10000}};
+
+/* ============================ STATE ============================ */
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function sample(){
+  const st=(exc,pfx,n)=>{const o={};for(let i=1;i<=n;i++){o[pfx+String(i).padStart(2,'0')]='Y'}return Object.assign(o,exc)};
+  return {sample:true,phase:2,project:{name:'Sample — Office Building B (6 floors, 1,240 outlets)',no:'SMP-2026-014',doc:'ICT-DD-001 Rev B',reviewer:'Reviewer (sample)',date:'2026-11-11'},
+  ph:{
+   sc:{st:st({sc06:'N',sc08:'N',sc04:'NA'},'sc',11),notes:{sc06:'Single entrance from north street only.'},m:{reqCov:85,stdCount:7,area:2400,trs:2,assume:6}},
+   pr:{st:st({pr07:'N',pr09:'N',pr11:''},'pr',11),notes:{},m:{trace:88,maxRun:84,spare:15,estClass:'4'}},
+   dd:{st:st({dd01:'N',dd09:'N',dd12:'N',dd18:'N',dd22:'N',dd04:'NA',dd20:'',dd23:''},'dd',23),notes:{dd01:'Outlets 5-112 to 5-118 at ~96 m from TR-5A.',dd09:'Sprinkler main crosses TR-3B ceiling.'},m:{pl:96,cords:10,fill:46,bends:270,tray:42,tbb:'6',fiberMargin:null}},
+   cn:{st:st({cn02:'N',cn06:'N',cn15:'N',cn17:'',cn19:'N'},'cn',19),notes:{cn02:'3 catalogue mismatches (see table).',cn06:'Trench at CH 0+120 measured 450 mm cover vs 600 mm spec.'},m:{match:null,rfiOpen:4,rfiAge:13,insp:92,intTested:60,poe:104}},
+   co:{st:st({co06:'N',co09:'N',co11:'N',co13:''},'co',14),notes:{},m:{cuPass:99.6,fiPass:100,asb:100,punchOpen:null,matrix:97,warranty:'Yes'}}},
+  fiber:{type:'OM4',len:180,cp:4,sp:0,app:'sr4'},
+  catalog:[
+   {item:'Horizontal cable',attr:'Category / listing',req:'Cat 6A U/UTP CMP',sub:'Cat 6A U/UTP CMR',mfr:'Vendor X 6A-R',eq:false},
+   {item:'Work area jack',attr:'Category',req:'Cat 6A',sub:'Cat 6A',mfr:'Vendor X J6A',eq:false},
+   {item:'Patch panel',attr:'Ports / form',req:'48-port angled 2U',sub:'48-port flat 2U + managers',mfr:'Vendor X PP48',eq:true},
+   {item:'Backbone fibre',attr:'Type / count',req:'OS2 24F OFNR',sub:'OS2 24F OFNR',mfr:'Vendor Y SM24',eq:false},
+   {item:'Access switch',attr:'PoE standard',req:'IEEE 802.3bt Type 4',sub:'IEEE 802.3at',mfr:'Vendor Z S48P',eq:false},
+   {item:'Wireless AP',attr:'Standard',req:'IEEE 802.11be',sub:'IEEE 802.11be',mfr:'Vendor Z AP7',eq:false},
+   {item:'Innerduct (plenum)',attr:'Listing',req:'Plenum-rated',sub:'Riser-rated',mfr:'Vendor W ID1',eq:false}],
+  punch:[
+   {id:'P-001',loc:'TR-2A',desc:'Missing bonding jumper on rack 3',disc:'Bonding',sev:'Critical',open:true},
+   {id:'P-002',loc:'L4 corridor',desc:'Firestop sleeve not sealed at grid C/7',disc:'Firestop',sev:'Critical',open:false},
+   {id:'P-003',loc:'TR-5A',desc:'Labels on panel PP-5A-02 not per TIA-606 format',disc:'Labelling',sev:'Major',open:true},
+   {id:'P-004',loc:'L1 lobby',desc:'Faceplate damaged at outlet 1-014',disc:'Cabling',sev:'Minor',open:true},
+   {id:'P-005',loc:'ER',desc:'Overhead ladder rack radius drop missing',disc:'Pathways',sev:'Minor',open:false}]};
+}
+function blank(){return{sample:false,phase:0,project:{name:'',no:'',doc:'',reviewer:'',date:new Date().toISOString().slice(0,10)},ph:Object.fromEntries(PHASES.map(p=>[p.key,{st:{},notes:{},m:{}}])),fiber:{type:'OS2i',len:300,cp:2,sp:0,app:'lr'},catalog:[],punch:[]}}
+let S=LS.get('dg.state',null)||sample();
+let KB=LS.get('dg.kb',{custom:[],fb:{},history:[]});
+let regFilter='all';
+const save=()=>{LS.set('dg.state',S);LS.set('dg.kb',KB)};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============================ ENGINE ============================ */
+function itemsOf(p){return p.items.concat(KB.custom.filter(c=>c.phase===p.key).map(c=>({...c,custom:true})))}
+function fiberCalc(){const f=S.fiber,ft=FIBER[f.type],ap=APPS[f.app];const loss=(+f.len/1000)*ft.att+(+f.cp)*0.75+(+f.sp)*0.3;
+  return{loss,max:ap.loss,margin:ap.loss-loss,reach:ap.reach,len:+f.len,mediaOk:ft.m===ap.m,ap,ft}}
+function catStatus(r){if(!r.req&&!r.sub)return'—';if(String(r.req).trim().toLowerCase()===String(r.sub).trim().toLowerCase())return'Match';return r.eq?'Accepted equal':'Mismatch'}
+function autoMetrics(p,m){
+  if(p.key==='dd'){const fc=fiberCalc();m.fiberMargin=+fc.margin.toFixed(2)}
+  if(p.key==='cn'){const rows=S.catalog.filter(r=>r.req||r.sub);m.match=rows.length?Math.round(100*rows.filter(r=>catStatus(r)!=='Mismatch').length/rows.length):null}
+  if(p.key==='co'){m.punchOpen=S.punch.filter(r=>r.open).length}
+}
+function evaluate(p){
+  const d=S.ph[p.key];const items=itemsOf(p);autoMetrics(p,d.m);
+  let wY=0,wRev=0,applicable=0,reviewed=0;const cats={};const comments=[];
+  const add=(c)=>comments.push(c);
+  items.forEach(it=>{const s=d.st[it.id]||'';cats[it.cat]=cats[it.cat]||{y:0,t:0};
+    if(s==='NA')return;applicable++;
+    if(s){reviewed++;wRev+=W[it.sev];cats[it.cat].t+=W[it.sev]}
+    if(s==='Y'){wY+=W[it.sev];cats[it.cat].y+=W[it.sev]}
+    if(s==='N')add({key:it.id,type:it.type,sev:it.sev,cat:it.cat,finding:'Non-compliant: '+it.check+(d.notes[it.id]?' — '+d.notes[it.id]:''),action:it.action,ref:it.ref,src:it.custom?'Lesson learned':'Checklist'});
+    if(!s&&p.key==='co')add({key:it.id,type:'HL',sev:it.sev,cat:it.cat,finding:'Not verified: '+it.check,action:'Verify on site/in records; unverified items count as open at closeout.',ref:it.ref,src:'Checklist'});
+  });
+  p.metrics.forEach(mt=>{const v=d.m[mt.k];if(v===''||v==null||!mt.rule)return;const val=mt.input==='select'?v:+v;if(mt.input!=='select'&&isNaN(val))return;
+    const r=mt.rule(val,d.m);if(r)add({key:'m:'+mt.k,cat:'Metrics',ref:mt.ref,src:'Metric',...r})});
+  if(p.key==='dd'){const fc=fiberCalc();
+    if(!fc.mediaOk)add({key:'m:fmedia',type:'CMD',sev:'Major',cat:'Metrics',finding:`Calculator media ${fc.ft.n} does not suit ${fc.ap.n}.`,action:'Select media that the application supports.',ref:'IEEE 802.3',src:'Metric'});
+    if(fc.len>fc.reach)add({key:'m:freach',type:'CMD',sev:'Critical',cat:'Metrics',finding:`Fibre link ${fc.len} m exceeds ${fc.ap.n} reach of ${fc.reach} m.`,action:'Change media/application or shorten the link.',ref:'IEEE 802.3',src:'Metric'})}
+  if(p.key==='cn')S.catalog.forEach((r,i)=>{if(catStatus(r)==='Mismatch')add({key:'cat:'+r.item,type:'CMD',sev:'Critical',cat:'Submittals & catalogue',finding:`Catalogue mismatch — ${r.item} (${r.attr}): spec “${r.req}”, submitted “${r.sub}”${r.mfr?' ['+r.mfr+']':''}.`,action:'Reject submittal item; resubmit a compliant product or request a formal deviation.',ref:'Project specification',src:'Catalogue'})});
+  if(p.key==='co')S.punch.filter(r=>r.open).forEach(r=>add({key:'punch:'+r.id,type:'CMD',sev:r.sev,cat:'Punch list',finding:`Open punch ${r.id} at ${r.loc}: ${r.desc}`,action:'Close and verify before acceptance.',ref:'Closeout procedure',src:'Punch'}));
+  const order={Critical:0,Major:1,Minor:2},torder={CMD:0,HL:1,REC:2};
+  comments.sort((a,b)=>order[a.sev]-order[b.sev]||torder[a.type]-torder[b.type]);
+  comments.forEach((c,i)=>c.no=p.pfx+'-'+String(i+1).padStart(3,'0'));
+  const score=wRev?Math.round(100*wY/wRev):0;const coverage=applicable?Math.round(100*reviewed/applicable):0;
+  const open=s=>comments.filter(c=>c.sev===s&&c.type!=='REC').length;
+  const crit=open('Critical'),maj=open('Major');
+  let dec;const needCov=p.key==='co'?100:80;
+  if(coverage<needCov)dec={c:'I',t:'Review incomplete',d:`Coverage ${coverage}% is below the ${needCov}% needed for a decision at this phase.`};
+  else if(crit>0)dec={c:'C',t:'C — Revise & resubmit',d:`${crit} critical finding(s) open. Gate “${p.gate}” is held.`};
+  else if(p.key==='co'&&comments.some(c=>c.type!=='REC'))dec={c:'C',t:'C — Not ready for closeout',d:'Every command and highlight must be closed before acceptance.'};
+  else if(score<p.threshold)dec={c:'C',t:'C — Revise & resubmit',d:`Weighted score ${score}% is below the ${p.threshold}% threshold.`};
+  else if(maj>0)dec={c:'B',t:'B — Approved as noted',d:`Proceed: “${p.gate}”. Close ${maj} major comment(s) in the next submission.`};
+  else dec={c:'A',t:'A — Approved',d:`Proceed: “${p.gate}”.`};
+  return{score,coverage,applicable,reviewed,cats,comments,crit,maj,dec,items}
+}
+
+/* ============================ RENDER ============================ */
+const P=()=>PHASES[S.phase];
+function renderAll(){renderProject();renderSteps();renderChecklist();renderMetrics();renderTool();renderOutcome();renderRegister();renderKB();$('#sampleTag').hidden=!S.sample}
+function renderProject(){document.querySelectorAll('[data-p]').forEach(el=>{el.value=S.project[el.dataset.p]||''})}
+function renderSteps(){
+  $('#steps').innerHTML=PHASES.map((p,i)=>{const r=evaluate(p);return`<button class="step" style="--pc:${p.color}" aria-pressed="${i===S.phase}" data-phase="${i}">
+  <span class="n">PHASE ${p.n} · FIBRE ${p.fiber.toUpperCase()}</span><span class="nm">${p.name}</span><span class="dp">${p.depth}</span>
+  <span class="sc"><span class="meter"><i style="width:${r.score}%"></i></span><span class="mono">${r.reviewed?r.score+'%':'—'}</span></span></button>`}).join('')}
+function renderChecklist(){
+  const p=P(),d=S.ph[p.key],r=evaluate(p);const cats=[...new Set(r.items.map(i=>i.cat))];
+  $('#checklist').style.setProperty('--pc',p.color);
+  $('#checklist').innerHTML=`<div class="phasehead"><div><h2>${p.n}. ${p.long} — checklist</h2><div class="focus">${p.focus}</div></div>
+   <div class="legend"><span class="ty CMD">CMD = Command (shall)</span><span class="ty HL">HL = Highlight</span><span class="ty REC">REC = Recommendation</span></div></div>`+
+  cats.map(c=>{const its=r.items.filter(i=>i.cat===c);const done=its.filter(i=>d.st[i.id]).length;
+   return`<div class="cat"><header><h3>${esc(c)}</h3><span class="muted mono" style="font-size:12px">${done}/${its.length} reviewed</span></header>`+
+   its.map(it=>{const s=d.st[it.id]||'';return`<div class="row"><div class="chk"><div>${esc(it.check)}</div>
+     <div class="meta"><span class="pill ${it.sev}">${it.sev}</span><span class="ty ${it.type}">${it.type}</span><span class="ref">${esc(it.ref)}</span>${it.custom?'<span class="custom">Lesson learned</span>':''}</div></div>
+     <div class="seg" role="group" aria-label="Status">${['Y','N','NA'].map(v=>`<button data-st="${it.id}" data-v="${v}" aria-pressed="${s===v}">${v==='Y'?'Yes':v==='N'?'No':'N/A'}</button>`).join('')}</div>
+     ${s==='N'?`<div class="note"><input type="text" id="note_${it.id}" data-note="${it.id}" placeholder="Reviewer remark (location, sheet, value found)" value="${esc(d.notes[it.id]||'')}"></div>`:''}</div>`}).join('')+`</div>`}).join('')}
+function renderMetrics(){
+  const p=P(),d=S.ph[p.key];autoMetrics(p,d.m);
+  $('#metrics').innerHTML=`<div class="phasehead"><h2>Phase metrics</h2><span class="muted" style="font-size:12px">Values are checked against the rule shown; results feed the comment register.</span></div>
+  <div class="tw"><table class="mtable"><thead><tr><th>Metric</th><th>Value</th><th>Unit</th><th>Basis</th><th>Result</th></tr></thead><tbody>`+
+  p.metrics.map(mt=>{const v=d.m[mt.k];let inp;
+   if(mt.auto)inp=`<span class="mono">${v==null?'—':v}</span> <span class="muted" style="font-size:11px">auto</span>`;
+   else if(mt.input==='select')inp=`<select id="m_${mt.k}" data-m="${mt.k}"><option value="">—</option>${mt.options.map(o=>`<option ${v===o?'selected':''}>${o}</option>`).join('')}</select>`;
+   else inp=`<input type="number" step="any" id="m_${mt.k}" data-m="${mt.k}" value="${v??''}">`;
+   return`<tr><td>${mt.label}</td><td class="v">${inp}</td><td class="mono">${mt.unit}</td><td class="r">${esc(mt.ref)}</td><td class="res" id="res_${mt.k}">${metricRes(p,mt)}</td></tr>`}).join('')+`</tbody></table></div>`}
+function metricRes(p,mt){const d=S.ph[p.key],v=d.m[mt.k];
+  if(mt.k==='match'){if(v==null)return'<span class="res muted">—</span>';return v<100?`<span class="res bad">${S.catalog.filter(r=>catStatus(r)==='Mismatch').length} mismatch(es)</span>`:'<span class="res ok">All matched</span>'}
+  if(mt.k==='punchOpen')return v>0?`<span class="res bad">${v} open</span>`:'<span class="res ok">All closed</span>';
+  if(!mt.rule)return'<span class="muted">input</span>';if(v===''||v==null)return'<span class="muted">—</span>';
+  const r=mt.rule(mt.input==='select'?v:+v,d.m);if(!r)return'<span class="res ok">Pass</span>';
+  return`<span class="res ${r.type==='CMD'?'bad':'warn'}">${TYPE_NAME[r.type]} · ${r.sev}</span>`}
+function renderTool(){
+  const p=P(),t=$('#tool');t.hidden=false;
+  if(p.key==='dd'){const f=S.fiber,fc=fiberCalc();
+   t.innerHTML=`<div class="phasehead"><h2>Fibre link loss budget</h2><span class="muted" style="font-size:12px">TIA-568.3 component allowances vs IEEE 802.3 channel insertion loss</span></div>
+   <div class="calc">
+    <label>Fibre type<select id="f_type" data-f="type">${Object.entries(FIBER).map(([k,v])=>`<option value="${k}" ${f.type===k?'selected':''}>${v.n} — ${v.att} dB/km</option>`).join('')}</select></label>
+    <label>Application<select id="f_app" data-f="app">${Object.entries(APPS).map(([k,v])=>`<option value="${k}" ${f.app===k?'selected':''}>${v.n}</option>`).join('')}</select></label>
+    <label>Link length (m)<input type="number" id="f_len" data-f="len" value="${f.len}"></label>
+    <label>Mated connector pairs (0.75 dB each)<input type="number" id="f_cp" data-f="cp" value="${f.cp}"></label>
+    <label>Splices (0.3 dB each)<input type="number" id="f_sp" data-f="sp" value="${f.sp}"></label>
+   </div>
+   <div class="calcout" id="fout">${fiberOut(fc)}</div>
+   <p class="explain">Loss = length × attenuation + pairs × 0.75 dB + splices × 0.3 dB (TIA-568.3 maximum component values). Application limits: IEEE 802.3 channel insertion loss and reach. The margin feeds the “Fibre loss margin” metric above.</p>`}
+  else if(p.key==='cn'){
+   t.innerHTML=`<div class="phasehead"><h2>Product catalogue match</h2><span class="muted" style="font-size:12px">Spec requirement vs submitted product. Exact text match = Match; tick “Equal” to accept an approved equal.</span></div>
+   <div class="tw"><table class="etable"><thead><tr><th>Item</th><th>Attribute</th><th>Spec requires</th><th>Submitted</th><th>Mfr / part</th><th>Equal</th><th>Status</th><th></th></tr></thead><tbody>
+   ${S.catalog.map((r,i)=>`<tr data-ci="${i}"><td><input type="text" id="c_item_${i}" data-c="item" value="${esc(r.item)}"></td><td><input type="text" id="c_attr_${i}" data-c="attr" value="${esc(r.attr)}"></td><td><input type="text" id="c_req_${i}" data-c="req" value="${esc(r.req)}"></td><td><input type="text" id="c_sub_${i}" data-c="sub" value="${esc(r.sub)}"></td><td><input type="text" id="c_mfr_${i}" data-c="mfr" value="${esc(r.mfr)}"></td><td><input type="checkbox" id="c_eq_${i}" data-c="eq" ${r.eq?'checked':''} aria-label="Accepted equal"></td><td class="cs">${catPill(r)}</td><td><button class="btn small" data-cdel="${i}">Remove</button></td></tr>`).join('')}
+   </tbody></table></div><div><button class="btn small" id="cAdd">Add product row</button></div>`}
+  else if(p.key==='co'){
+   t.innerHTML=`<div class="phasehead"><h2>Punch list tracker</h2><span class="muted" style="font-size:12px">Each open item becomes a Command in the register.</span></div>
+   <div class="tw"><table class="etable"><thead><tr><th>ID</th><th>Location</th><th>Description</th><th>Discipline</th><th>Severity</th><th>Status</th><th></th></tr></thead><tbody>
+   ${S.punch.map((r,i)=>`<tr data-pi="${i}"><td style="width:80px"><input type="text" id="pu_id_${i}" data-pu="id" value="${esc(r.id)}"></td><td><input type="text" id="pu_loc_${i}" data-pu="loc" value="${esc(r.loc)}"></td><td style="min-width:240px"><input type="text" id="pu_desc_${i}" data-pu="desc" value="${esc(r.desc)}"></td><td><input type="text" id="pu_disc_${i}" data-pu="disc" value="${esc(r.disc)}"></td><td><select id="pu_sev_${i}" data-pu="sev">${['Critical','Major','Minor'].map(s=>`<option ${r.sev===s?'selected':''}>${s}</option>`).join('')}</select></td><td><button class="btn small" data-ptog="${i}">${r.open?'<span class="res bad">Open</span>':'<span class="res ok">Closed</span>'}</button></td><td><button class="btn small" data-pdel="${i}">Remove</button></td></tr>`).join('')}
+   </tbody></table></div><div><button class="btn small" id="pAdd">Add punch item</button></div>`}
+  else{t.innerHTML=`<h2>Review depth for this phase</h2><p class="explain">${p.n===1?'Scoping is reviewed at decision level only: is the basis complete enough to price and plan? Detailed calculations are deferred to detailed design.':'The proposal is reviewed for concept soundness: topology, reach, media and integration. Calculations are indicative; exact values are confirmed at detailed design.'} Gate threshold: <b class="mono">${p.threshold}%</b> weighted score, no open critical findings, ≥ 80% coverage.</p>`}
+}
+function fiberOut(fc){return`<div class="kv"><span>Calculated loss</span><b>${fc.loss.toFixed(2)} dB</b></div><div class="kv"><span>Application max</span><b>${fc.max.toFixed(2)} dB</b></div>
+ <div class="kv"><span>Margin</span><b style="color:${fc.margin<0?'var(--crit)':fc.margin<1?'var(--major)':'var(--ok)'}">${fc.margin.toFixed(2)} dB</b></div><div class="kv"><span>Reach</span><b style="color:${fc.len>fc.reach?'var(--crit)':'var(--ok)'}">${fc.len} / ${fc.reach} m</b></div>`}
+function catPill(r){const s=catStatus(r);return`<span class="pill ${s==='Mismatch'?'Critical':s==='—'?'Minor':'ok'}">${s}</span>`}
+function ring(score,color){const C=2*Math.PI*50,off=C*(1-score/100);return`<svg class="ring" viewBox="0 0 120 120" role="img" aria-label="Weighted score ${score}%"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--line)" stroke-width="10"/><circle cx="60" cy="60" r="50" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 60 60)"/><text x="60" y="58" text-anchor="middle" font-size="24" font-weight="500">${score}%</text><text x="60" y="78" text-anchor="middle" font-size="10" fill="var(--muted)" style="fill:var(--muted)">weighted</text></svg>`}
+function renderOutcome(){
+  const p=P(),r=evaluate(p);const o=$('#outcome');o.style.setProperty('--pc',p.color);
+  const t={CMD:0,HL:0,REC:0};r.comments.forEach(c=>t[c.type]++);const tot=r.comments.length||1;
+  const sev={Critical:0,Major:0,Minor:0};r.comments.forEach(c=>sev[c.sev]++);
+  o.innerHTML=`<h3>Review outcome · Phase ${p.n}</h3>
+  <div class="ringrow">${ring(r.score,p.color)}<div class="decision"><div class="code ${r.dec.c}">${r.dec.t}</div><div style="font-size:13px">${r.dec.d}</div><div class="muted" style="font-size:12px">Threshold ${p.threshold}% · gate: ${p.gate}</div></div></div>
+  <div class="kpis">
+   <div class="kv"><span>Coverage</span><b>${r.coverage}% <small class="muted" style="font-size:11px">${r.reviewed}/${r.applicable}</small></b></div>
+   <div class="kv"><span>Findings</span><b>${r.comments.length}</b></div>
+   <div class="kv"><span>Critical open</span><b style="color:${r.crit?'var(--crit)':'var(--ok)'}">${r.crit}</b></div>
+   <div class="kv"><span>Major open</span><b style="color:${r.maj?'var(--major)':'var(--ok)'}">${r.maj}</b></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px"><h3>Outcome mix</h3>
+   <div class="stack" role="img" aria-label="Commands ${t.CMD}, highlights ${t.HL}, recommendations ${t.REC}"><i style="width:${100*t.CMD/tot}%;background:var(--crit)"></i><i style="width:${100*t.HL/tot}%;background:var(--major)"></i><i style="width:${100*t.REC/tot}%;background:var(--accent)"></i></div>
+   <div class="legend" style="font-size:12px"><span><b class="mono">${t.CMD}</b> Commands</span>·<span><b class="mono">${t.HL}</b> Highlights</span>·<span><b class="mono">${t.REC}</b> Recommendations</span></div>
+   <div class="legend" style="font-size:12px"><span class="pill Critical">${sev.Critical} Critical</span><span class="pill Major">${sev.Major} Major</span><span class="pill Minor">${sev.Minor} Minor</span></div></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><h3>Compliance by category</h3><div class="bars">
+   ${Object.entries(r.cats).filter(([,v])=>v.t).map(([k,v])=>{const pc=Math.round(100*v.y/v.t);return`<div class="bar"><span class="lb" title="${esc(k)}">${esc(k)}</span><span class="t"><i style="width:${pc}%;background:${pc>=p.threshold?'var(--ok)':pc>=50?'var(--major)':'var(--crit)'}"></i></span><span class="mono" style="text-align:right">${pc}%</span></div>`}).join('')||'<span class="muted">No items reviewed yet.</span>'}
+  </div></div>
+  <p class="explain" style="margin:0">Score = Σ weight(Yes) ÷ Σ weight(reviewed), weights Critical 5 · Major 3 · Minor 1. N/A excluded.</p>`}
+function renderRegister(){
+  const p=P(),r=evaluate(p);const rows=r.comments.filter(c=>regFilter==='all'||c.type===regFilter||c.sev===regFilter);
+  const f=(v,l)=>`<button data-rf="${v}" aria-pressed="${regFilter===v}">${l}</button>`;
+  $('#register').innerHTML=`<div class="phasehead"><div><h2>Comment register — ${p.long}</h2><div class="muted" style="font-size:12px">${esc(S.project.name||'Untitled project')} · ${esc(S.project.doc||'')} · ${esc(S.project.date||'')}</div></div>
+  <div class="actions"><button class="btn small" id="copyReg">Copy register (paste into Excel)</button></div></div>
+  <div class="filters">${f('all','All '+r.comments.length)}${f('CMD','Commands')}${f('HL','Highlights')}${f('REC','Recommendations')}${f('Critical','Critical')}${f('Major','Major')}</div>
+  <div class="tw"><table class="reg"><thead><tr><th>No.</th><th>Type</th><th>Severity</th><th>Finding</th><th>Required action</th><th>Basis</th><th>Source</th><th>Useful?</th></tr></thead><tbody>
+  ${rows.map(c=>{const fb=KB.fb[c.key]||{};return`<tr class="${c.sev}"><td class="no">${c.no}</td><td><span class="ty ${c.type}">${TYPE_NAME[c.type]}</span></td><td><span class="pill ${c.sev}">${c.sev}</span></td><td style="min-width:240px">${esc(c.finding)}</td><td style="min-width:220px">${esc(c.action)}</td><td class="mono" style="font-size:11.5px;min-width:140px">${esc(c.ref)}</td><td style="font-size:12px">${c.src}</td>
+   <td><div class="fb"><button data-fb="${esc(c.key)}" data-dir="u" aria-pressed="${fb.last==='u'}" title="Useful">Yes ${fb.u||0}</button><button data-fb="${esc(c.key)}" data-dir="d" aria-pressed="${fb.last==='d'}" title="Not useful">No ${fb.d||0}</button></div></td></tr>`}).join('')||'<tr><td colspan="8" class="muted">No findings for this filter.</td></tr>'}
+  </tbody></table></div>`}
+function renderKB(){
+  const p=P();const hist=KB.history;
+  const cnt={};hist.forEach(h=>(h.keys||[]).forEach(k=>cnt[k]=(cnt[k]||0)+1));
+  const label=k=>{for(const ph of PHASES){const it=itemsOf(ph).find(i=>i.id===k);if(it)return ph.pfx+' · '+it.check;const mt=ph.metrics.find(m=>'m:'+m.k===k);if(mt)return ph.pfx+' · '+mt.label}return k};
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const fbList=Object.entries(KB.fb).filter(([,v])=>(v.d||0)>=2&&(v.d||0)>(v.u||0));
+  const ph=hist.filter(h=>h.phase===p.key).slice(-12);
+  $('#kb').innerHTML=`<div class="phasehead"><div><h2>Knowledge base &amp; learning loop</h2><div class="explain">The MVP learns by rules, not by a trained model: reviewers add lessons-learned checks, rate each generated comment, and saved snapshots reveal recurring findings. Stored in this browser; use Copy/Import to share.</div></div>
+  <div class="actions"><button class="btn small" id="kbCopy">Copy knowledge base (JSON)</button><button class="btn small" id="kbImportBtn">Import…</button></div></div>
+  <div id="kbImport" hidden><textarea id="kbText" rows="4" placeholder="Paste knowledge base JSON here"></textarea><div class="actions" style="margin-top:6px"><button class="btn small primary" id="kbDoImport">Import and merge</button></div></div>
+  <div class="kbgrid">
+   <div class="col" style="gap:10px"><h3>Add a lessons-learned check · Phase ${p.n}</h3>
+    <form class="form" id="kbForm">
+     <label class="full">Check (what the reviewer verifies)<input type="text" id="k_check" required placeholder="e.g. Wi-Fi AP outlets have 2 × Cat 6A for future multi-gig"></label>
+     <label>Category<input type="text" id="k_cat" value="Lessons learned"></label>
+     <label>Basis / reference<input type="text" id="k_ref" placeholder="Standard, clause or project lesson"></label>
+     <label>Severity<select id="k_sev"><option>Critical</option><option selected>Major</option><option>Minor</option></select></label>
+     <label>Outcome type<select id="k_type"><option value="CMD">Command</option><option value="HL" selected>Highlight</option><option value="REC">Recommendation</option></select></label>
+     <label class="full">Required action<input type="text" id="k_act" placeholder="What the designer must do"></label>
+     <div class="full"><button class="btn primary small" type="submit">Add to phase ${p.n} checklist</button></div>
+    </form>
+    <ul class="list">${KB.custom.length?KB.custom.map((c,i)=>`<li><span>${PHASES.find(x=>x.key===c.phase).pfx} · ${esc(c.check)}</span><button class="btn small" data-kdel="${i}">Remove</button></li>`).join(''):'<li class="muted">No custom checks yet.</li>'}</ul>
+   </div>
+   <div class="col" style="gap:10px"><h3>Score trend · Phase ${p.n} snapshots</h3>${trend(ph,p)}
+    <h3>Comment wording to rework</h3><ul class="list">${fbList.length?fbList.map(([k,v])=>`<li><span>${esc(label(k))}</span><span class="mono">${v.u||0}↑ ${v.d||0}↓</span></li>`).join(''):'<li class="muted">None. Comments rated “No” twice or more appear here.</li>'}</ul>
+   </div>
+   <div class="col" style="gap:10px"><h3>Top recurring findings (all snapshots)</h3>
+    <ul class="list">${top.length?top.map(([k,n])=>`<li><span>${esc(label(k))}</span><span class="mono">${n}×</span></li>`).join(''):'<li class="muted">Save snapshots to build history.</li>'}</ul>
+    <div class="muted" style="font-size:12px">${hist.length} snapshot(s) saved · ${KB.custom.length} custom check(s) · ${Object.keys(KB.fb).length} rated comment(s)</div>
+    ${hist.length?'<button class="btn small" id="histClear">Clear history</button>':''}
+   </div>
+  </div>`}
+function trend(h,p){if(h.length<2)return`<div class="muted" style="font-size:12px">${h.length?'1 snapshot saved. Save another to see a trend.':'No snapshots for this phase yet.'}</div>`;
+  const w=320,ht=120,pad=24,x=i=>pad+i*(w-pad*2)/(h.length-1),y=v=>ht-pad-(v/100)*(ht-pad*1.6);
+  const pts=h.map((s,i)=>`${x(i)},${y(s.score)}`).join(' ');
+  return`<svg viewBox="0 0 ${w} ${ht}" style="width:100%;max-width:100%;height:auto" role="img" aria-label="Score trend">
+  ${[0,50,100].map(v=>`<line x1="${pad}" x2="${w-pad}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${pad-4}" y="${y(v)+3}" font-size="9" text-anchor="end" style="fill:var(--muted)">${v}</text>`).join('')}
+  <line x1="${pad}" x2="${w-pad}" y1="${y(p.threshold)}" y2="${y(p.threshold)}" stroke="var(--major)" stroke-dasharray="3 3"/>
+  <polyline points="${pts}" fill="none" stroke="${p.color}" stroke-width="2"/>
+  ${h.map((s,i)=>`<circle cx="${x(i)}" cy="${y(s.score)}" r="${i===h.length-1?4:2.5}" style="fill:${p.color}"/>`).join('')}
+  <text x="${x(h.length-1)}" y="${y(h[h.length-1].score)-8}" font-size="10" text-anchor="end" style="fill:var(--ink)" font-family="var(--mono)">${h[h.length-1].score}%</text></svg>`}
+
+/* ============================ EVENTS ============================ */
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,2200)}
+function light(){save();renderOutcome();renderRegister();renderSteps();$('#sampleTag').hidden=!S.sample}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.phase!=null){S.phase=+b.dataset.phase;save();renderAll();return}
+  if(b.dataset.st){const d=S.ph[P().key];d.st[b.dataset.st]=d.st[b.dataset.st]===b.dataset.v?'':b.dataset.v;save();renderSteps();renderChecklist();renderOutcome();renderRegister();return}
+  if(b.dataset.rf){regFilter=b.dataset.rf;renderRegister();return}
+  if(b.dataset.fb){const k=b.dataset.fb,f=KB.fb[k]=KB.fb[k]||{u:0,d:0};f[b.dataset.dir]=(f[b.dataset.dir]||0)+1;f.last=b.dataset.dir;save();renderRegister();renderKB();toast('Feedback recorded');return}
+  if(b.dataset.cdel!=null){S.catalog.splice(+b.dataset.cdel,1);save();renderTool();renderMetrics();light();return}
+  if(b.dataset.pdel!=null){S.punch.splice(+b.dataset.pdel,1);save();renderTool();renderMetrics();light();return}
+  if(b.dataset.ptog!=null){const r=S.punch[+b.dataset.ptog];r.open=!r.open;save();renderTool();renderMetrics();light();return}
+  if(b.dataset.kdel!=null){KB.custom.splice(+b.dataset.kdel,1);save();renderAll();return}
+  switch(b.id){
+   case'btnSample':S=sample();save();renderAll();toast('Sample project loaded');break;
+   case'btnBlank':S=blank();save();renderAll();toast('Blank review started');break;
+   case'btnSave':{const p=P(),r=evaluate(p);KB.history.push({ts:new Date().toISOString(),phase:p.key,project:S.project.name,score:r.score,coverage:r.coverage,code:r.dec.c,crit:r.crit,maj:r.maj,keys:r.comments.map(c=>c.key)});save();renderKB();toast(`Snapshot saved: phase ${p.n}, ${r.score}%`);break}
+   case'cAdd':S.catalog.push({item:'',attr:'',req:'',sub:'',mfr:'',eq:false});save();renderTool();break;
+   case'pAdd':S.punch.push({id:'P-'+String(S.punch.length+1).padStart(3,'0'),loc:'',desc:'',disc:'',sev:'Minor',open:true});save();renderTool();renderMetrics();light();break;
+   case'copyReg':{const r=evaluate(P());const tsv=[['No','Type','Severity','Category','Finding','Required action','Basis','Source'].join('\t'),...r.comments.map(c=>[c.no,TYPE_NAME[c.type],c.sev,c.cat,c.finding,c.action,c.ref,c.src].join('\t'))].join('\n');copy(tsv,'Register copied — paste into Excel');break}
+   case'kbCopy':copy(JSON.stringify({custom:KB.custom,fb:KB.fb},null,1),'Knowledge base copied');break;
+   case'kbImportBtn':$('#kbImport').hidden=!$('#kbImport').hidden;break;
+   case'kbDoImport':try{const j=JSON.parse($('#kbText').value);(j.custom||[]).forEach(c=>{if(!KB.custom.some(x=>x.id===c.id))KB.custom.push(c)});Object.entries(j.fb||{}).forEach(([k,v])=>{const f=KB.fb[k]=KB.fb[k]||{u:0,d:0};f.u+=v.u||0;f.d+=v.d||0});save();renderAll();toast('Knowledge base merged')}catch(err){toast('Import failed: the text is not valid JSON')}break;
+   case'histClear':KB.history=[];save();renderKB();toast('History cleared');break;
+  }});
+function copy(text,msg){const done=()=>toast(msg);try{navigator.clipboard.writeText(text).then(done,()=>fallback(text))}catch(e){fallback(text)}}
+function fallback(text){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied')}catch(e){toast('Select and copy manually')}ta.remove()}
+document.addEventListener('input',e=>{const el=e.target;
+  if(el.dataset.p){S.project[el.dataset.p]=el.value;S.sample=false;light();return}
+  if(el.dataset.note){S.ph[P().key].notes[el.dataset.note]=el.value;light();return}
+  if(el.dataset.m){S.ph[P().key].m[el.dataset.m]=el.value;const mt=P().metrics.find(m=>m.k===el.dataset.m);$('#res_'+mt.k).innerHTML=metricRes(P(),mt);light();return}
+  if(el.dataset.f){S.fiber[el.dataset.f]=el.value;$('#fout').innerHTML=fiberOut(fiberCalc());renderMetrics();light();return}
+  if(el.dataset.c){const tr=el.closest('tr'),r=S.catalog[+tr.dataset.ci];r[el.dataset.c]=el.type==='checkbox'?el.checked:el.value;tr.querySelector('.cs').innerHTML=catPill(r);renderMetrics();light();return}
+  if(el.dataset.pu){const tr=el.closest('tr');S.punch[+tr.dataset.pi][el.dataset.pu]=el.value;light();return}
+});
+document.addEventListener('submit',e=>{if(e.target.id!=='kbForm')return;e.preventDefault();const p=P();const chk=$('#k_check').value.trim();if(!chk)return;
+  KB.custom.push({id:'kb'+Date.now().toString(36),phase:p.key,cat:$('#k_cat').value.trim()||'Lessons learned',check:chk,ref:$('#k_ref').value.trim()||'Project lesson learned',sev:$('#k_sev').value,type:$('#k_type').value,action:$('#k_act').value.trim()||'Address per lessons learned.'});
+  save();renderAll();toast(`Check added to phase ${p.n}`)});
+renderAll();
+</script>
+
+</body>
+</html>

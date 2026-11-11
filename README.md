@@ -60,3 +60,27 @@ smile-ai/
 
 ## That's it! 🎉
 Your smile.ai app will be live at your domain.
+
+---
+
+# DesignGate ICT — Design Review MVP (`design-review.html`)
+
+Phase-gated design review for telecom/ICT engineering documents. Static page, no backend, no API key. Open `design-review.html` in a browser.
+
+| Phase | Review depth | Gate threshold | Phase-specific tool |
+|---|---|---|---|
+| 1 Scoping (DBSP) | High-level | 70% | TR-per-floor-area rule (TIA-569) |
+| 2 Proposal | Light, high-level | 75% | 90 m reach / estimate-class rules |
+| 3 Detailed design | Detailed | 85% | Fibre loss budget (TIA-568.3 vs IEEE 802.3) |
+| 4 Construction | Civils, catalogue, integration | 90% | Product catalogue match table |
+| 5 Closeout | All items must be Yes | 100% | Punch list tracker |
+
+Outputs per phase: weighted score (Critical 5 / Major 3 / Minor 1), coverage, decision code
+(A Approved · B Approved as noted · C Revise & resubmit · Review incomplete), and a numbered comment
+register typed **Command** (shall), **Highlight** (risk) or **Recommendation** (should), copyable to Excel.
+
+Learning loop (rules-based, stored in browser `localStorage`): lessons-learned checks per phase,
+Useful/Not-useful rating per comment, review snapshots with score trend and top recurring findings,
+JSON export/import to share the knowledge base.
+
+Standards are cited by document name without edition; confirm the edition adopted by the AHJ/contract.
