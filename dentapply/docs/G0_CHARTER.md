@@ -23,6 +23,7 @@ Prepared 2026-11-18. Status: **awaiting product-owner approval.**
 | Purpose | Help Canadian pre-dental students find, compare and track dental school applications in Canada, the US, the UK, Australia and Ireland, using verified, sourced requirements only |
 | Origin | Built first for uOttawa students (uOttawa has no dental faculty) |
 | Sponsor / product owner | You |
+| Co-developer | Adnane (added 2026-11-18), all stages |
 | Builder | Claude Code, with your review at each gate |
 | Users | Canadian pre-dental students, any university |
 | Platform | PWA first; native iOS App Store after beta; Android later |
@@ -105,14 +106,14 @@ Build, testing and marketing time comes on top of this. If your available time i
 
 ## 7. Stakeholders and RACI
 
-| Activity | Product owner (you) | Claude Code | Student testers | Pre-dental clubs (outreach only) |
-|---|---|---|---|---|
-| Scope, budget, gate approval | A/R | C | — | — |
-| Data verification | A | R (where the network allows) | C (error reports) | — |
-| Engineering, tests, deployment | A | R | — | — |
-| Usability testing | A | R (scripts) | R | C |
-| Marketing outreach | A/R | R (content) | — | C |
-| Apple account, App Store submission | R/A | C | — | — |
+| Activity | Product owner (you) | Co-developer (Adnane) | Claude Code | Student testers | Pre-dental clubs (outreach only) |
+|---|---|---|---|---|---|
+| Scope, budget, gate approval | A/R | C | C | — | — |
+| Data verification | A | R | R (where the network allows) | C (error reports) | — |
+| Engineering, tests, deployment | A | R | R | — | — |
+| Usability testing | A | R | R (scripts) | R | C |
+| Marketing outreach | A/R | C | R (content) | — | C |
+| Apple account, App Store submission | R/A | C | C | — | — |
 
 R = responsible, A = accountable, C = consulted.
 
