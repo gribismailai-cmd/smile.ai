@@ -261,7 +261,7 @@ textarea{width:100%;min-height:200px;font:13px/1.45 var(--f-data);padding:10px;b
       <div class="card-head"><h2>Coverage</h2><button class="linkbtn" data-go="schools">All schools</button></div>
       <div class="list" id="coverage"></div>
     </div>
-    <div class="footlinks"><button class="linkbtn" data-legal="disclaimer">Disclaimer</button><button class="linkbtn" data-legal="terms">Terms</button><button class="linkbtn" data-legal="privacy">Privacy</button></div>
+    <div class="footlinks"><button class="linkbtn" id="openFeedback">Beta feedback</button><button class="linkbtn" data-legal="disclaimer">Disclaimer</button><button class="linkbtn" data-legal="terms">Terms</button><button class="linkbtn" data-legal="privacy">Privacy</button></div>
     <p class="foot">DentPath is independent. It is not affiliated with any university, dental faculty, admissions service or testing agency. Confirm every requirement on the school's own website.</p>
   </section>
 
@@ -545,6 +545,20 @@ function openReport(id, key){
   };
 }
 
+/* ---------- beta feedback ---------- */
+function openFeedback(){
+  const text = ["DentPath beta feedback", `Date: ${TODAY.toISOString().slice(0,10)}`, `Device / browser: ${navigator.userAgent}`,
+    "What I tried to do: ", "What happened: ", "What I expected: ", "Anything confusing or missing: ", "Score 1-5 (would you recommend DentPath?): "].join("\n");
+  openSheet(`<div><span class="eyebrow">Beta</span><h2 id="sheetTitle">Send feedback</h2></div>
+    <p class="t2" style="margin:0">Fill in the lines, copy, and send it to the person who invited you to the beta. Nothing is sent automatically.</p>
+    <label class="lbl" for="feedbackText">Feedback</label><textarea id="feedbackText">${esc(text)}</textarea>
+    <div class="btns"><button class="btn" id="copyFeedback">Copy feedback</button></div>`);
+  $("#copyFeedback").onclick = () => {
+    const ta = $("#feedbackText");
+    try { navigator.clipboard.writeText(ta.value).then(() => $("#copyFeedback").textContent = "Copied", () => { ta.focus(); ta.select(); }); } catch { ta.focus(); ta.select(); }
+  };
+}
+
 /* ---------- legal ---------- */
 const LEGAL = {
   disclaimer: ["Disclaimer", `<p>DentPath is an independent planning tool. It is not affiliated with, endorsed by, or approved by any university, dental faculty, admissions service or testing agency.</p>
@@ -690,6 +704,7 @@ function bind(){
   });
   ["#f-prov","#f-gpa","#f-aa","#f-pat","#f-entry","#f-casper","#f-french","#f-120"].forEach(id => $(id).addEventListener("change", readProfile));
   $("#openGpa").onclick = openGpa;
+  $("#openFeedback").onclick = openFeedback;
   $("#scrim").onclick = closeSheet;
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
   window.addEventListener("hashchange", () => go(location.hash.slice(1), false));

@@ -89,6 +89,11 @@ for (const scheme of ["light", "dark"]) {
     assert.match(await page.textContent("#sheetIn"), /What we collect/);
     await page.click("#closeSheet");
   });
+  await check(`${scheme}: Beta feedback opens a copyable template`, async () => {
+    await page.click("#openFeedback");
+    assert.match(await page.inputValue("#feedbackText"), /DentPath beta feedback/);
+    await page.click("#closeSheet");
+  });
   await check(`${scheme}: no console errors and no third-party requests`, async () => {
     assert.deepEqual(errors, []);
     assert.deepEqual(external, []);

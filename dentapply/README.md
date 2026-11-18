@@ -4,10 +4,10 @@
 |---|---|---|
 | `web/` | The app (PWA): `index.html`, `logic.js`, `schools.json` (schema v2) | Beta. Canada: 10 schools as *draft* (unverified). US/UK/AU/IE: coming soon |
 | `web/schema/` | JSON Schema for school records | v2 |
-| `tests/` | Unit tests (`logic.test.js`) and UI tests (`ui.test.mjs`) | 21 + 16 passing |
+| `tests/` | Unit tests (`logic.test.js`) and UI tests (`ui.test.mjs`) | 21 + 18 passing |
 | `tools/` | Data validator, v1→v2 migration | — |
 | `ios/DentPath/` | SwiftUI source | Not compiled; still on schema v1, update after beta |
-| `docs/` | Master prompt, G0 charter, G1 plan, G2 report, legal drafts | — |
+| `docs/` | Master prompt, G0 charter, G1 plan, G2 report, G3 beta kit, legal drafts | — |
 
 ## Commands (from `dentapply/`)
 
