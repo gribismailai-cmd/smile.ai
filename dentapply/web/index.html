@@ -217,6 +217,12 @@ td ul{margin:0;padding-left:16px;color:var(--muted);font-size:13px}
 @media (max-width:420px){.form{grid-template-columns:minmax(0,1fr)} .stats .v{font-size:19px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
+/* Touch targets: Apple HIG minimum 44pt */
+.card-head a,.linkbtn{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 2px}
+.chip{min-height:44px}
+.closebtn{min-height:44px;padding:10px 16px}
+.row .t1 a{display:inline-flex;align-items:center;min-height:44px}
+.card-head{margin-bottom:6px}
 /* G2 additions */
 .beta{font-size:13px}
 .cs-card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px dashed var(--tooth-line);border-radius:var(--r);padding:14px}
