@@ -101,6 +101,27 @@ for (const scheme of ["light", "dark"]) {
   await page.screenshot({ path: process.env.SHOTS ? `${process.env.SHOTS}/${scheme}-home.png` : "/dev/null" }).catch(() => {});
   await ctx.close();
 }
+// Launch mode with no verified schools: every screen explains the empty state.
+{
+  const ctx = await browser.newContext({ ...devices["iPhone 13"] });
+  const page = await ctx.newPage(); const errors = [];
+  page.on("pageerror", e => errors.push(e.message));
+  await page.route("**/index.html", async route => {
+    const res = await route.fetch(); const body = (await res.text()).replace('const RELEASE_MODE = "beta";', 'const RELEASE_MODE = "launch";');
+    await route.fulfill({ response: res, body });
+  });
+  await check("launch mode: 0 verified schools shows explanations, no blank cards", async () => {
+    await page.goto(BASE + "#home"); await page.waitForSelector("#coverage .row");
+    assert.match(await page.textContent("#betaBanner"), /0 of 10 Canadian schools verified/);
+    assert.match(await page.textContent("#fitNote"), /No schools are verified yet/);
+    await page.click(".tab[data-go=fit]");
+    assert.match(await page.textContent("#fitBody"), /No schools are verified yet/);
+    await page.click(".tab[data-go=schools]");
+    assert.equal(await page.locator("#schoolGrid .pill", { hasText: "Coming soon" }).count(), 10);
+    assert.deepEqual(errors, []);
+  });
+  await ctx.close();
+}
 await browser.close(); server.close();
 console.log(results.join("\n"));
 console.log(`\n${results.length - failed} passed, ${failed} failed`);

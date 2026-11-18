@@ -400,6 +400,12 @@ const provName = c => (L.PROVINCES.find(p => p[0] === c) || [c, c])[1];
 /* ---------- home ---------- */
 function renderBetaBanner(){
   const drafts = schools().filter(s => s.status === "draft").length;
+  if (RELEASE_MODE === "launch"){
+    const ca = schools().filter(s => s.country === "CA"), ok = ca.filter(visible).length;
+    $("#betaBanner").innerHTML = ok < ca.length
+      ? `<div class="banner beta"><p><b>${ok} of ${ca.length} Canadian schools verified so far.</b> The rest show as Coming soon until each one is checked on its official page.</p></div>` : "";
+    return;
+  }
   $("#betaBanner").innerHTML = RELEASE_MODE === "beta" && drafts
     ? `<div class="banner beta"><p><b>Beta.</b> ${drafts} schools show data from search results that the DentPath team has not yet checked on the official page. Those values carry an <span class="pill unv">Unverified</span> label.</p></div>` : "";
 }
@@ -408,7 +414,8 @@ function renderBanner(){
   const el = $("#cycleBanner");
   if (!c.known){ el.innerHTML = ""; return; }
   if (c.closed === c.known){
-    el.innerHTML = `<div class="banner"><p><b>Fall ${c.year + 1} applications have closed</b> at all ${c.known} Canadian schools with a known deadline that you can apply to. Dates shown are projected for Fall ${c.year + 2} entry from this year's calendar.</p></div>`;
+    const which = c.known === 1 ? "the one Canadian school" : c.known === 2 ? "both Canadian schools" : `all ${c.known} Canadian schools`;
+    el.innerHTML = `<div class="banner"><p><b>Fall ${c.year + 1} applications have closed</b> at ${which} with a known deadline that you can apply to. Dates shown are projected for Fall ${c.year + 2} entry from this year's calendar.</p></div>`;
   } else if (c.closed > 0){
     el.innerHTML = `<div class="banner"><p><b>${c.closed} of ${c.known} deadlines have passed</b> for Fall ${c.year + 1} entry. The rest are still open; see Next deadlines.</p></div>`;
   } else {
@@ -443,6 +450,7 @@ function renderNext(){
 }
 function renderFitSnapshot(){
   const r = schools().filter(visible).map(s => L.evaluate(s, profile, RELEASE_MODE));
+  if (!r.length){ $("#fitNote").innerHTML = `<p class="t2" style="margin:0">No schools are verified yet. Your fit results appear here as schools are checked.</p>`; $("#fitStats").innerHTML = ""; return; }
   const count = k => r.filter(x => x.level === k).length;
   $("#fitNote").innerHTML = profile.example ? `<p class="example" style="margin:0 0 10px">Showing the example profile. Enter your numbers in Fit.</p>` : "";
   $("#fitStats").innerHTML = [
@@ -456,7 +464,8 @@ function renderCoverage(){
   $("#coverage").innerHTML = DATA.countries.map(c => {
     const listed = schools().filter(s => s.country === c.code);
     const shown = listed.filter(visible).length;
-    const status = c.status === "coming-soon" ? `<span class="pill p-mute">Coming soon</span>` : `<span class="pill p-ok">${shown} listed</span>`;
+    const status = c.status === "coming-soon" ? `<span class="pill p-mute">Coming soon</span>`
+      : `<span class="pill ${shown ? "p-ok" : "p-mute"}">${RELEASE_MODE === "launch" ? `${shown} of ${listed.length} verified` : `${shown} listed`}</span>`;
     return `<div class="row"><div class="main"><div class="t1">${esc(c.name)}</div><div class="t2">${esc(countLabel(c))} ${conf(c.countConfidence)}</div></div>${status}</div>`;
   }).join("");
 }
@@ -612,7 +621,8 @@ function renderFitResults(){
     .sort((a,b) => rank[a.r.level] - rank[b.r.level] || a.s.short.localeCompare(b.s.short));
   $("#fitBody").innerHTML = rows.map(({s,r}) => `<div class="fitrow">
     <div class="fit-top"><div><b>${esc(s.short)}</b> <span class="t2">${esc(s.region)} · ${esc(s.degree)}</span> ${s.status === "draft" ? `<span class="pill unv">Unverified</span>` : ""}</div><span class="pill ${PILL[r.level]}">${esc(r.label)}</span></div>
-    ${r.reasons.length ? `<ul>${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>`).join("");
+    ${r.reasons.length ? `<ul>${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>`).join("")
+    || `<p class="t2" style="margin:0">No schools are verified yet. Results appear here as each school is checked on its official page.</p>`;
   const vis = schools().filter(visible);
   renderScale("#gpaChart", 2.5, 4.0, [2.5,3.0,3.5,4.0], vis.filter(s => s.fields.gpaMinimum.value != null).map(s => ({name:s.short, min:s.fields.gpaMinimum.value, comp:s.fields.gpaCompetitive.value})), profile.gpa, 1,
     [["var(--bad)","Published minimum"],["var(--info)","Typical interviewee (3rd-party)"],["var(--accent)","You"]]);
@@ -711,6 +721,7 @@ function bind(){
   ["#f-prov","#f-gpa","#f-aa","#f-pat","#f-entry","#f-casper","#f-french","#f-120"].forEach(id => $(id).addEventListener("change", readProfile));
   $("#openGpa").onclick = openGpa;
   $("#openFeedback").onclick = openFeedback;
+  $("#openFeedback").hidden = RELEASE_MODE !== "beta";
   $("#scrim").onclick = closeSheet;
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
   window.addEventListener("hashchange", () => go(location.hash.slice(1), false));
