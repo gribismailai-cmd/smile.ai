@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DentPath Ottawa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Dental school application planner for University of Ottawa students.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="DentPath">
+<meta name="theme-color" content="#0B7A75">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: phone-first single column, sticky title bar, fixed bottom tab bar like an iOS app; widens to a centred 720px column on desktop. */
+:root{
+  --bg:#F2F5F6; --surface:#FFFFFF; --ink:#13202A; --muted:#5A6B76; --line:#D9E2E6;
+  --accent:#0B7A75; --accent-ink:#FFFFFF; --accent-soft:#DCEFED;
+  --ok:#1E7B4A; --ok-soft:#DFF1E6; --warn:#9A5B00; --warn-soft:#FBEBD2;
+  --bad:#B3261E; --bad-soft:#F8DEDB; --info:#3A57A0; --info-soft:#E1E7F6;
+  --tooth:#E9EEF0; --tooth-line:#BFCBD1;
+  --f-display:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-data:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r:14px; --r-sm:9px; --tab-h:64px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1418; --surface:#152027; --ink:#E6EEF1; --muted:#93A5AF; --line:#25343C;
+  --accent:#4FC1B8; --accent-ink:#06211F; --accent-soft:#12302F;
+  --ok:#62C98F; --ok-soft:#133022; --warn:#E6A940; --warn-soft:#33260F;
+  --bad:#F28A80; --bad-soft:#3A1916; --info:#93AAF0; --info-soft:#1A2440;
+  --tooth:#1D2B33; --tooth-line:#34464F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1418; --surface:#152027; --ink:#E6EEF1; --muted:#93A5AF; --line:#25343C;
+  --accent:#4FC1B8; --accent-ink:#06211F; --accent-soft:#12302F;
+  --ok:#62C98F; --ok-soft:#133022; --warn:#E6A940; --warn-soft:#33260F;
+  --bad:#F28A80; --bad-soft:#3A1916; --info:#93AAF0; --info-soft:#1A2440;
+  --tooth:#1D2B33; --tooth-line:#34464F; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+a{color:var(--accent)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:720px;margin:0 auto;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:12px}
+.mark{width:34px;height:34px;flex:none;border-radius:10px;background:var(--accent);display:grid;place-items:center}
+.mark svg{width:20px;height:20px}
+.topbar h1{font-size:18px;font-weight:800}
+.topbar p{margin:0;font-size:12px;color:var(--muted)}
+
+main{max-width:720px;margin:0 auto;padding-block:16px calc(var(--tab-h) + 28px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.view{display:flex;flex-direction:column;gap:16px}
+.view-title{font-size:26px;font-weight:800}
+.lede{margin:-8px 0 0;color:var(--muted);font-size:14px;max-width:60ch}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card h2{font-size:16px;font-weight:700}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.card-head a,.linkbtn{font-size:13px;font-weight:600;color:var(--accent);background:none;border:0;padding:6px 0;cursor:pointer;text-decoration:none}
+.eyebrow{font:600 11px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.banner{border-radius:var(--r);padding:14px 16px;background:var(--warn-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);display:flex;gap:12px;align-items:flex-start}
+.banner b{color:var(--warn)}
+.banner.ok{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 35%,transparent)}
+.banner.ok b{color:var(--ok)}
+.banner p{margin:0;font-size:14px}
+
+/* Arch progress */
+.arch-wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;justify-items:center}
+.arch{width:100%;max-width:340px;height:auto}
+.arch .t{fill:var(--tooth);stroke:var(--tooth-line);stroke-width:1.5;transition:fill .25s}
+.arch .t.done{fill:var(--accent);stroke:var(--accent)}
+.arch text{fill:var(--ink);font-family:var(--f-display);font-weight:800}
+.arch .sub{fill:var(--muted);font-family:var(--f-body);font-weight:500}
+.arch-caption{font-size:13px;color:var(--muted);text-align:center}
+
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{background:var(--bg);border-radius:var(--r-sm);padding:10px 12px}
+.stat .v{font:700 22px/1.1 var(--f-display)}
+.stat .l{font-size:12px;color:var(--muted)}
+
+/* Lists */
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);min-height:52px}
+.row:first-child{border-top:0;padding-top:0}
+.row .main{flex:1;min-width:0}
+.row .t1{font-weight:600}
+.row .t2{font-size:13px;color:var(--muted)}
+.days{text-align:right;flex:none}
+.days .n{font:700 20px/1 var(--f-display)}
+.days .u{font-size:11px;color:var(--muted)}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 11px/1 var(--f-body);padding:5px 8px;border-radius:999px;white-space:nowrap;letter-spacing:.02em}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--bad-soft);color:var(--bad)} .p-info{background:var(--info-soft);color:var(--info)}
+.p-mute{background:var(--bg);color:var(--muted)}
+.conf{font:500 10px/1 var(--f-data);padding:3px 6px;border-radius:5px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.conf.official{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.conf.third-party{color:var(--info);border-color:color-mix(in srgb,var(--info) 45%,transparent)}
+.conf.dated{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.conf.unknown{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,transparent)}
+
+/* Chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;min-height:38px;font-size:14px;font-weight:500;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* School cards */
+.schools{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.school{display:flex;flex-direction:column;gap:10px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;cursor:pointer;width:100%}
+.school:active{transform:scale(.99)}
+.school-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.school h3{font-size:16px;font-weight:700}
+.school .loc{font-size:13px;color:var(--muted)}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:13px;margin:0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;min-width:0}
+
+/* Sheet */
+.scrim{position:fixed;inset:0;background:rgba(5,12,16,.45);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--surface);border-radius:20px 20px 0 0;max-height:88%;overflow-y:auto;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);padding-block:8px calc(24px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet.open{transform:none}
+.sheet-in{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:4px auto 6px}
+.sheet h2{font-size:22px;font-weight:800}
+.sec{display:flex;flex-direction:column;gap:6px}
+.sec-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.sec-row .k{color:var(--muted);flex:none;max-width:40%}
+.sec-row .v{text-align:right;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.src{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;align-items:center}
+.src a{min-width:0;overflow-wrap:anywhere}
+.closebtn{align-self:flex-end;border:0;background:var(--bg);border-radius:999px;padding:8px 14px;font-weight:600;cursor:pointer;min-height:38px}
+
+/* Forms */
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label,.lbl{font-size:13px;font-weight:600;color:var(--muted)}
+input[type=number],select{width:100%;font:500 17px var(--f-data);padding:11px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--bg);color:var(--ink);min-height:46px}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;min-height:52px}
+.toggle input{appearance:none;width:51px;height:31px;border-radius:999px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:background .2s}
+.toggle input::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.toggle input:checked{background:var(--accent)}
+.toggle input:checked::after{transform:translateX(20px)}
+.btn{border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:12px 16px;min-height:46px;cursor:pointer}
+.btn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.example{font-size:12px;color:var(--warn);font-weight:600}
+
+/* Results table */
+.tbl-wrap{overflow-x:auto;margin:0 -16px;padding:0 16px}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+th{font:600 11px/1.2 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 8px 8px 0;border-bottom:1px solid var(--line)}
+td{padding:10px 8px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td ul{margin:0;padding-left:16px;color:var(--muted);font-size:13px}
+
+.fitrow{padding:12px 0;border-top:1px solid var(--line)}
+.fitrow:first-child{border-top:0;padding-top:0}
+.fit-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.fitrow .t2{font-size:12px;color:var(--muted)}
+.fitrow ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+/* Scale charts */
+.scale{display:flex;flex-direction:column;gap:12px}
+.srow{display:grid;grid-template-columns:84px minmax(0,1fr);gap:10px;align-items:center}
+.srow .nm{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{position:relative;height:26px;border-radius:6px;background:var(--bg)}
+.track .grid{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.mk{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.mk.min{width:3px;height:22px;background:var(--bad);border-radius:2px}
+.mk.comp{width:12px;height:12px;background:var(--info);transform:translate(-50%,-50%) rotate(45deg);border-radius:2px}
+.mk.ref{width:12px;height:12px;border:2px solid var(--info);border-radius:50%;background:var(--surface)}
+.mk.you{width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--accent)}
+.axis{display:grid;grid-template-columns:84px minmax(0,1fr);gap:10px}
+.axis .ticks{position:relative;height:16px;font:500 11px var(--f-data);color:var(--muted)}
+.axis .ticks span{position:absolute;transform:translateX(-50%)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px}
+
+/* Checklist */
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;min-height:52px}
+.check:first-child{border-top:0}
+.check input{appearance:none;width:26px;height:26px;flex:none;border-radius:8px;border:2px solid var(--tooth-line);background:var(--surface);display:grid;place-items:center;cursor:pointer;margin-top:1px}
+.check input:checked{background:var(--accent);border-color:var(--accent)}
+.check input:checked::after{content:"";width:7px;height:12px;border:solid var(--accent-ink);border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.check .t1{font-weight:600}
+.check.done .t1{color:var(--muted);text-decoration:line-through}
+.check .t2{font-size:13px;color:var(--muted)}
+
+/* GPA rows */
+.grow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;gap:8px;align-items:center}
+.iconbtn{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:20px;line-height:1}
+.gpa-out{display:flex;align-items:baseline;gap:10px}
+.gpa-out .v{font:800 34px/1 var(--f-display)}
+
+.foot{font-size:12px;color:var(--muted);max-width:65ch}
+.copy{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.copy code{font-family:var(--f-data);font-size:13px;background:var(--bg);padding:4px 8px;border-radius:6px;user-select:all}
+
+/* Tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:15;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tabbar-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tab-h)}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;min-height:44px}
+.tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab[aria-current="page"]{color:var(--accent)}
+
+@media (max-width:420px){.form{grid-template-columns:minmax(0,1fr)} .stats .v{font-size:19px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3c-2.5 0-4 2-4 4.6 0 2.5 1.2 4.1 1.8 6.6.5 2.2.8 6.8 2.7 6.8 1.7 0 1.5-4.6 2.5-6 .5-.7 1.5-.7 2 0 1 1.4.8 6 2.5 6 1.9 0 2.2-4.6 2.7-6.8.6-2.5 1.8-4.1 1.8-6.6C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3Z" fill="#fff"/></svg></div>
+  <div><h1>DentPath</h1><p>Dental school applications · for uOttawa students</p></div>
+</div></header>
+
+<main>
+  <!-- HOME -->
+  <section class="view" id="v-home" data-view="home">
+    <div id="cycleBanner"></div>
+    <div class="card">
+      <div class="card-head"><h2>Application readiness</h2><button class="linkbtn" data-go="plan">Open plan</button></div>
+      <div class="arch-wrap"><svg class="arch" id="arch" viewBox="0 0 340 190" role="img" aria-label="Checklist progress"></svg>
+      <div class="arch-caption" id="archCap"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Next deadlines</h2><button class="linkbtn" data-go="plan">Full timeline</button></div>
+      <div class="list" id="nextList"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Your fit snapshot</h2><button class="linkbtn" data-go="fit">Edit profile</button></div>
+      <div id="fitNote"></div>
+      <div class="stats" id="fitStats"></div>
+    </div>
+    <p class="foot">DentPath is a student planning tool. It is not affiliated with the University of Ottawa or any dental faculty. Every figure carries a source tag; confirm on the school's site before you rely on it. uOttawa does not offer a DDS/DMD program, so students apply to the faculties listed here.</p>
+  </section>
+
+  <!-- SCHOOLS -->
+  <section class="view" id="v-schools" data-view="schools" hidden>
+    <h2 class="view-title">Dental schools</h2>
+    <p class="lede">All 10 Canadian DDS/DMD programs, read from an Ontario resident's point of view. Tap a school for requirements and sources.</p>
+    <div class="chips" role="group" aria-label="Filter schools" id="chips"></div>
+    <div class="schools" id="schoolGrid"></div>
+  </section>
+
+  <!-- FIT -->
+  <section class="view" id="v-fit" data-view="fit" hidden>
+    <h2 class="view-title">Fit check</h2>
+    <p class="lede">Compares your numbers with each school's published minimums. It does not predict admission: no school publishes enough data for that.</p>
+    <div class="card">
+      <div class="card-head"><h2>Your profile</h2><span class="example" id="exampleTag">Example profile. Replace with yours.</span></div>
+      <div class="form">
+        <div class="field"><label for="f-gpa">GPA (OMSAS 4.0)</label><input id="f-gpa" type="number" inputmode="decimal" step="0.01" min="0" max="4"></div>
+        <div class="field"><label for="f-aa">DAT Academic Avg</label><input id="f-aa" type="number" inputmode="decimal" step="0.1" min="1" max="30"></div>
+        <div class="field"><label for="f-pat">DAT PAT</label><input id="f-pat" type="number" inputmode="decimal" step="0.1" min="1" max="30"></div>
+        <div class="field"><label for="f-entry">Target entry</label><select id="f-entry"></select></div>
+      </div>
+      <div style="margin-top:8px">
+        <label class="toggle" for="f-casper"><span>CASPer completed this cycle</span><input id="f-casper" type="checkbox"></label>
+        <label class="toggle" for="f-french"><span>Can study in French</span><input id="f-french" type="checkbox"></label>
+        <label class="toggle" for="f-120"><span>120-credit bachelor's done by entry</span><input id="f-120" type="checkbox"></label>
+        <label class="toggle" for="f-qc"><span>Quebec resident status</span><input id="f-qc" type="checkbox"></label>
+      </div>
+      <div class="btns" style="margin-top:12px"><button class="btn ghost" id="openGpa">Calculate GPA from grades</button></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Results by school</h2></div>
+      <div class="list" id="fitBody"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>GPA against published figures</h2></div>
+      <div class="scale" id="gpaChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>DAT against published cut-offs</h2></div>
+      <div class="scale" id="datChart"></div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="view" id="v-plan" data-view="plan" hidden>
+    <h2 class="view-title">Plan</h2>
+    <p class="lede">A checklist for one application cycle, and every dated step across the schools. Checked items are saved on this device.</p>
+    <div class="card">
+      <div class="card-head"><h2>Checklist</h2><span class="num" id="checkCount"></span></div>
+      <div id="checklist"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Timeline</h2></div>
+      <div class="list" id="timeline"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Resources</h2></div>
+      <div class="list" id="resources"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Sections"><div class="tabbar-in">
+  <button class="tab" data-go="home"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></svg>Home</button>
+  <button class="tab" data-go="schools"><svg viewBox="0 0 24 24"><path d="M3 9 12 4l9 5-9 5-9-5Z"/><path d="M7 11.5V16c0 1.5 2.2 3 5 3s5-1.5 5-3v-4.5"/></svg>Schools</button>
+  <button class="tab" data-go="fit"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Fit</button>
+  <button class="tab" data-go="plan"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M8 12l2.5 2.5L16 9"/></svg>Plan</button>
+</div></nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="sheet-in" id="sheetIn"></div></div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get(k, d){ try { const v = localStorage.getItem("dentpath:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem("dentpath:" + k, JSON.stringify(v)); } catch {} }
+};
+const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+const MS_DAY = 86400000;
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmt = d => `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+const CONF_LABEL = {official:"official", "third-party":"3rd-party", dated:"prior cycle", unknown:"unverified"};
+const conf = c => `<span class="conf ${esc(c)}">${esc(CONF_LABEL[c] || c)}</span>`;
+
+/* OMSAS 4.0 values for uOttawa letter grades. Unverified against the OUAC table row for Ottawa. */
+const OMSAS = {"A+":4.0,"A":3.9,"A-":3.7,"B+":3.3,"B":3.0,"C+":2.3,"C":2.0,"D+":1.3,"D":1.0,"E":0.0,"F":0.0};
+
+const CHECKLIST = [
+  {id:"prereq", t:"Map your uOttawa courses to each school's prerequisites", s:"U of T: done by end of May of entry year. Dalhousie: by May 1."},
+  {id:"gpa", t:"Calculate your OMSAS-scale GPA", s:"U of T and Western publish a 3.00 minimum."},
+  {id:"datreg", t:"Register for the Canadian DAT (CDA)", s:"Year-round at Prometric. Seats fill early in big cities."},
+  {id:"dat", t:"Write the DAT", s:"UBC: by Aug 31. Alberta: by early Dec. Western needs the Reading Comprehension version."},
+  {id:"casper", t:"Complete CASPer", s:"Required by U of T, Western and McGill."},
+  {id:"lang", t:"English or French proficiency, if it applies", s:"U of T: within 24 months of Nov 1. UdeM and Laval teach in French."},
+  {id:"transcripts", t:"Order official uOttawa transcripts", s:"Each school sets its own document deadline."},
+  {id:"essays", t:"Draft personal statement and autobiographical sketch", s:"Western's international pathway asks for a sketch; others vary."},
+  {id:"submit", t:"Submit applications", s:"Dalhousie Oct 1 · UBC Oct 10 · U of T / Western / Alberta Nov 1 · UdeM Nov 15"},
+  {id:"interview", t:"Prepare for interviews and assessments", s:"Western interviews up to 200. Alberta has an in-person Pre-Entry Exam."}
+];
+
+const EXAMPLE = {gpa:3.80, aa:20, pat:20, casper:false, french:false, c120:true, qc:false, entry:null, example:true};
+let DATA = null;
+let profile = store.get("profile", null) || {...EXAMPLE};
+let checks = store.get("checks", {});
+let filter = store.get("filter", "all");
+
+/* ---------- dates ---------- */
+function resolveDate(d){
+  if (!d || !d.month) return null;
+  const explicit = d.year ? new Date(d.year, d.month - 1, d.day) : null;
+  let y = d.year || TODAY.getFullYear();
+  let date = new Date(y, d.month - 1, d.day);
+  let projected = !d.year;
+  while (date < TODAY){ y++; date = new Date(y, d.month - 1, d.day); projected = true; }
+  return {date, projected, explicit, days: Math.round((date - TODAY) / MS_DAY)};
+}
+function cycleStatus(){
+  const y = TODAY.getFullYear();
+  const known = DATA.schools.filter(s => s.deadline && s.deadline.month && s.ontarioStatus !== "not-eligible");
+  const closed = known.filter(s => new Date(y, s.deadline.month - 1, s.deadline.day) < TODAY);
+  return {y, known: known.length, closed: closed.length};
+}
+
+/* ---------- home ---------- */
+function renderBanner(){
+  const c = cycleStatus();
+  const el = $("#cycleBanner");
+  if (c.closed === c.known){
+    el.innerHTML = `<div class="banner"><p><b>Fall ${c.y + 1} applications have closed</b> at all ${c.known} schools with a known deadline that Ontario residents can apply to. Dates below are projected for Fall ${c.y + 2} entry, from this year's calendar. USask and Manitoba deadlines were not found; check them directly.</p></div>`;
+  } else if (c.closed > 0){
+    el.innerHTML = `<div class="banner"><p><b>${c.closed} of ${c.known} deadlines have passed</b> for Fall ${c.y + 1} entry. The rest are still open; see Next deadlines.</p></div>`;
+  } else {
+    el.innerHTML = `<div class="banner ok"><p><b>Fall ${c.y + 1} cycle is open.</b> ${c.known} schools with known deadlines are ahead of you.</p></div>`;
+  }
+}
+function renderArch(){
+  const n = CHECKLIST.length, done = CHECKLIST.filter(i => checks[i.id]).length;
+  const cx = 170, cy = 168, rx = 140, ry = 128;
+  let g = "";
+  CHECKLIST.forEach((it, i) => {
+    const a = Math.PI + (Math.PI * (i + 0.5) / n);
+    const x = cx + rx * Math.cos(a), y = cy + ry * Math.sin(a);
+    const rot = (a * 180 / Math.PI) + 90;
+    const w = (i === 0 || i === n - 1) ? 30 : (i < 3 || i > n - 4) ? 26 : 22;
+    g += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)})"><rect class="t${checks[it.id] ? " done" : ""}" x="${-w/2}" y="-17" width="${w}" height="34" rx="${w/2.6}"><title>${esc(it.t)}</title></rect></g>`;
+  });
+  g += `<text x="170" y="128" text-anchor="middle" font-size="40">${done}/${n}</text><text class="sub" x="170" y="152" text-anchor="middle" font-size="13">steps complete</text>`;
+  $("#arch").innerHTML = g;
+  const next = CHECKLIST.find(i => !checks[i.id]);
+  $("#archCap").textContent = next ? `Next: ${next.t}` : "Every step is checked. Confirm each school's documents arrived.";
+}
+function deadlineEvents(){
+  const ev = [];
+  for (const s of DATA.schools){
+    if (s.ontarioStatus === "not-eligible") continue;
+    const all = [];
+    if (s.deadline) all.push({...s.deadline, main:true});
+    (s.otherDates || []).forEach(d => all.push(d));
+    for (const d of all){
+      const r = resolveDate(d);
+      if (r) ev.push({s, d, ...r});
+    }
+  }
+  return ev.sort((a,b) => a.date - b.date);
+}
+function renderNext(){
+  const ev = deadlineEvents().filter(e => e.d.main).slice(0, 5);
+  $("#nextList").innerHTML = ev.map(e => `
+    <div class="row">
+      <div class="main"><div class="t1">${esc(e.s.short)} · ${esc(e.d.label)}</div>
+        <div class="t2">${fmt(e.date)}${e.projected ? " · projected" : ""} ${conf(e.d.confidence)}</div></div>
+      <div class="days"><div class="n num">${e.days}</div><div class="u">days</div></div>
+    </div>`).join("") || `<p class="t2">No dated deadlines found.</p>`;
+}
+function renderFitSnapshot(){
+  const r = DATA.schools.map(s => evaluate(s, profile));
+  const count = k => r.filter(x => x.level === k).length;
+  $("#fitNote").innerHTML = profile.example ? `<p class="example" style="margin:0 0 10px">Showing the example profile. Enter your numbers in Fit.</p>` : "";
+  $("#fitStats").innerHTML = [
+    ["Meets minimums", count("ok"), "var(--ok)"],
+    ["Needs action", count("warn") + count("info"), "var(--warn)"],
+    ["Below min. / ineligible", count("bad"), "var(--bad)"]
+  ].map(([l,v,c]) => `<div class="stat"><div class="v num" style="color:${c}">${v}</div><div class="l">${l}</div></div>`).join("");
+}
+
+/* ---------- fit logic ---------- */
+function evaluate(s, p){
+  const reasons = []; let level = "ok"; let checked = 0;
+  const rank = {ok:0, info:1, warn:2, bad:3};
+  const bump = l => { if (rank[l] > rank[level]) level = l; };
+  if (s.ontarioStatus === "not-eligible" && !p.qc){ reasons.push(s.ontarioStatusNote); bump("bad"); return {level, label:"Not eligible", reasons}; }
+  if (s.requiresFrench && !p.french){ reasons.push(`Program taught in French.`); bump("bad"); }
+  if (s.requires120Credits && !p.c120){ reasons.push(`Needs a 120-credit bachelor's by July 31 of entry year.`); bump("bad"); }
+  if (s.gpaMin != null){ checked++;
+    if (p.gpa < s.gpaMin){ reasons.push(`GPA ${p.gpa.toFixed(2)} is below the ${s.gpaMin.toFixed(2)} minimum.`); bump("bad"); }
+    else if (s.gpaCompetitive != null && p.gpa < s.gpaCompetitive){ reasons.push(`Meets minimum; below the ~${s.gpaCompetitive.toFixed(2)} typical of interviewees (3rd-party).`); bump("info"); }
+  }
+  if (s.dat && s.dat.minimum != null){ checked++;
+    if (p.aa < s.dat.minimum){ reasons.push(`DAT AA ${p.aa} is below the ${s.dat.minimum} out-of-province cut-off${s.dat.minimumIsApprox ? " (USask uses its own average; approximate)" : ""}.`); bump("bad"); }
+  }
+  if (s.dat && s.dat.reference != null && p.aa < s.dat.reference){ reasons.push(`DAT AA below an older reported cut-off of ${s.dat.reference} (3rd-party, 2020).`); bump("info"); }
+  if (s.casper && s.casper.required === true && !p.casper){ reasons.push("CASPer required and not yet done."); bump("warn"); }
+  if (s.dat && s.dat.required === true && !p.aa){ reasons.push("DAT required."); bump("warn"); }
+  if (s.ontarioStatus === "limited" && level !== "bad") reasons.push(s.ontarioStatusNote);
+  let label = {ok:"Meets published minimums", info:"Meets minimums", warn:"Action needed", bad:"Below minimum"}[level];
+  if (level === "bad" && (s.requiresFrench && !p.french || s.requires120Credits && !p.c120)) label = "Blocked";
+  if (checked === 0 && (level === "ok" || level === "info")){ level = "info"; label = "No minimum published"; reasons.unshift("No GPA or DAT minimum found in research. Verify on the school site."); }
+  return {level, label, reasons};
+}
+function readProfile(){
+  const num = (id, d) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : d; };
+  profile = {gpa: num("#f-gpa", 0), aa: num("#f-aa", 0), pat: num("#f-pat", 0),
+    casper: $("#f-casper").checked, french: $("#f-french").checked, c120: $("#f-120").checked, qc: $("#f-qc").checked,
+    entry: $("#f-entry").value, example:false};
+  store.set("profile", profile);
+  $("#exampleTag").hidden = true;
+  renderFitResults(); renderFitSnapshot();
+}
+function fillProfile(){
+  const c = cycleStatus();
+  const first = c.closed === c.known ? c.y + 2 : c.y + 1;
+  $("#f-entry").innerHTML = [first, first + 1, first + 2].map(y => `<option value="${y}">Fall ${y}</option>`).join("");
+  $("#f-gpa").value = profile.gpa; $("#f-aa").value = profile.aa; $("#f-pat").value = profile.pat;
+  $("#f-casper").checked = !!profile.casper; $("#f-french").checked = !!profile.french;
+  $("#f-120").checked = !!profile.c120; $("#f-qc").checked = !!profile.qc;
+  if (profile.entry) $("#f-entry").value = profile.entry;
+  $("#exampleTag").hidden = !profile.example;
+}
+const PILL = {ok:"p-ok", info:"p-info", warn:"p-warn", bad:"p-bad"};
+function renderFitResults(){
+  const order = {bad:3, warn:2, info:1, ok:0};
+  const rows = DATA.schools.map(s => ({s, r: evaluate(s, profile)}))
+    .sort((a,b) => order[a.r.level] - order[b.r.level] || a.s.short.localeCompare(b.s.short));
+  $("#fitBody").innerHTML = rows.map(({s,r}) => `<div class="fitrow">
+    <div class="fit-top"><div><b>${esc(s.short)}</b> <span class="t2">${esc(s.province)} · ${esc(s.degree)}</span></div><span class="pill ${PILL[r.level]}">${esc(r.label)}</span></div>
+    ${r.reasons.length ? `<ul>${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>`).join("");
+  renderScale("#gpaChart", 2.5, 4.0, [2.5,3.0,3.5,4.0], DATA.schools.filter(s => s.gpaMin != null).map(s => ({name:s.short, min:s.gpaMin, comp:s.gpaCompetitive})), profile.gpa, 2,
+    [["var(--bad)","Published minimum (official)"],["var(--info)","Typical interviewee (3rd-party)"],["var(--accent)","You"]]);
+  renderScale("#datChart", 15, 30, [15,20,25,30], DATA.schools.filter(s => s.dat && (s.dat.minimum != null || s.dat.reference != null)).map(s => ({name:s.short, min:s.dat.minimum, ref:s.dat.reference})), profile.aa, 1,
+    [["var(--bad)","Out-of-province cut-off, 2026 (official)"],["var(--info)","Older reported cut-off (3rd-party, 2020)"],["var(--accent)","Your Academic Average"]]);
+}
+function renderScale(sel, lo, hi, ticks, rows, you, dp, legend){
+  const pct = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+  const grid = ticks.map(t => `<span class="grid" style="left:${pct(t)}%"></span>`).join("");
+  let h = rows.map(r => `<div class="srow"><div class="nm">${esc(r.name)}</div><div class="track">${grid}
+    ${r.min != null ? `<span class="mk min" style="left:${pct(r.min)}%" title="Minimum ${r.min}"></span>` : ""}
+    ${r.comp != null ? `<span class="mk comp" style="left:${pct(r.comp)}%" title="Typical ${r.comp}"></span>` : ""}
+    ${r.ref != null ? `<span class="mk ref" style="left:${pct(r.ref)}%" title="Reference ${r.ref}"></span>` : ""}
+    ${you ? `<span class="mk you" style="left:${pct(you)}%" title="You ${you}"></span>` : ""}</div></div>`).join("");
+  h += `<div class="axis"><div></div><div class="ticks">${ticks.map(t => `<span style="left:${pct(t)}%">${t.toFixed(dp === 2 ? 1 : 0)}</span>`).join("")}</div></div>`;
+  h += `<div class="legend">${legend.map(([c,l]) => `<span><i style="background:${c}"></i>${esc(l)}</span>`).join("")}</div>`;
+  if (!rows.length) h = `<p class="t2">No published figures to compare.</p>`;
+  $(sel).innerHTML = h;
+}
+
+/* ---------- schools ---------- */
+const STATUS = {
+  home:{label:"Ontario school", cls:"p-ok"},
+  limited:{label:"Out-of-province", cls:"p-warn"},
+  "not-eligible":{label:"Not open to Ontario", cls:"p-bad"}
+};
+const FILTERS = [["all","All 10"],["home","Ontario"],["limited","Out-of-province"],["not-eligible","Not eligible"],["french","French"]];
+function renderChips(){
+  $("#chips").innerHTML = FILTERS.map(([k,l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join("");
+}
+function renderSchools(){
+  const list = DATA.schools.filter(s => filter === "all" || (filter === "french" ? s.language === "French" : s.ontarioStatus === filter));
+  $("#schoolGrid").innerHTML = list.map(s => {
+    const r = resolveDate(s.deadline);
+    const st = STATUS[s.ontarioStatus];
+    return `<button class="school" data-id="${s.id}">
+      <div class="school-top"><div><h3>${esc(s.name)}</h3><div class="loc">${esc(s.city)}, ${esc(s.province)} · ${esc(s.degree)} · ${esc(s.language)}</div></div>
+      <span class="pill ${st.cls}">${st.label}</span></div>
+      <dl class="kv">
+        <dt>Deadline</dt><dd>${r ? `${fmt(r.date)}${r.projected ? " (proj.)" : ""} ${conf(s.deadline.confidence)}` : s.ontarioStatus === "not-eligible" ? "—" : `Not found ${conf("unknown")}`}</dd>
+        <dt>Min GPA</dt><dd>${s.gpaMin != null ? `<span class="num">${s.gpaMin.toFixed(2)}</span> ${conf(s.gpaMinConfidence)}` : `Not published ${conf("unknown")}`}</dd>
+        <dt>CASPer</dt><dd>${s.casper.required === true ? "Required" : s.casper.required === false ? "Not required" : "Unconfirmed"} ${conf(s.casper.confidence)}</dd>
+        <dt>Seats</dt><dd>${s.seats != null ? `<span class="num">${s.seats}</span>${s.outOfProvinceSeats != null ? ` · <span class="num">${s.outOfProvinceSeats}</span> out-of-prov.` : ""} ${conf(s.seatsConfidence)}` : `Not found ${conf("unknown")}`}</dd>
+      </dl></button>`;
+  }).join("");
+}
+function openSchool(id){
+  const s = DATA.schools.find(x => x.id === id); if (!s) return;
+  const r = resolveDate(s.deadline);
+  const row = (k, v) => v ? `<div class="sec-row"><span class="k">${k}</span><span class="v">${v}</span></div>` : "";
+  const dates = (s.otherDates || []).map(d => { const x = resolveDate(d); return row(esc(d.label), `${x ? fmt(x.date) + (x.projected ? " (proj.)" : "") : "—"} ${conf(d.confidence)}${d.note ? `<small style="color:var(--muted)">${esc(d.note)}</small>` : ""}`); }).join("");
+  $("#sheetIn").innerHTML = `<div class="grab"></div>
+    <button class="closebtn" id="closeSheet">Close</button>
+    <div><span class="eyebrow">${esc(s.city)}, ${esc(s.province)} · ${esc(s.degree)}</span><h2 id="sheetTitle">${esc(s.name)}</h2></div>
+    <div class="banner ${s.ontarioStatus === "home" ? "ok" : ""}"><p><b>${STATUS[s.ontarioStatus].label}.</b> ${esc(s.ontarioStatusNote)}</p></div>
+    <div class="sec"><span class="eyebrow">Dates</span>
+      ${row(esc(s.deadline ? s.deadline.label : "Application"), s.deadline ? `${r ? fmt(r.date) + (r.projected ? " (proj.)" : "") : "Not found"} ${conf(s.deadline.confidence)}${s.deadline.note ? `<small style="color:var(--muted)">${esc(s.deadline.note)}</small>` : ""}` : "Not applicable")}
+      ${dates}</div>
+    <div class="sec"><span class="eyebrow">Requirements</span>
+      ${row("Minimum GPA", s.gpaMin != null ? `<span class="num">${s.gpaMin.toFixed(2)}</span> (OMSAS 4.0) ${conf(s.gpaMinConfidence)}` : `Not published ${conf("unknown")}`)}
+      ${s.gpaCompetitive != null ? row("Competitive GPA", `<span class="num">~${s.gpaCompetitive.toFixed(2)}</span> ${conf(s.gpaCompetitiveConfidence)}<small style="color:var(--muted)">${esc(s.gpaCompetitiveNote)}</small>`) : row("GPA notes", s.gpaCompetitiveNote ? `<small>${esc(s.gpaCompetitiveNote)}</small>` : "")}
+      ${row("DAT", `${s.dat.required === true ? "Required" : s.dat.required === false ? "Not required" : "Unconfirmed"} ${conf(s.dat.confidence)}${s.dat.rule ? `<small style="color:var(--muted)">${esc(s.dat.rule)}</small>` : ""}`)}
+      ${row("CASPer", `${s.casper.required === true ? "Required" : s.casper.required === false ? "Not required" : "Unconfirmed"} ${conf(s.casper.confidence)}`)}
+      ${row("Language", esc(s.language))}
+      ${row("Interview", esc(s.interview))}
+      ${row("Applying through", esc(s.applicationRoute))}
+      ${row("Seats", s.seats != null ? `<span class="num">${s.seats}</span> ${conf(s.seatsConfidence)}` : "")}
+      ${row("Applicants / year", s.applicantsPerYear ? `<span class="num">${s.applicantsPerYear}${s.id === "western" ? "+" : ""}</span> ${conf(s.applicantsConfidence)}` : "")}
+    </div>
+    <div class="sec"><span class="eyebrow">Sources</span>
+      ${s.sources.map(x => `<div class="src"><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>${conf(x.tier)}</div>`).join("")}</div>`;
+  $("#sheet").classList.add("open"); $("#scrim").classList.add("open");
+  $("#closeSheet").focus();
+}
+function closeSheet(){ $("#sheet").classList.remove("open"); $("#scrim").classList.remove("open"); }
+
+/* ---------- GPA calculator ---------- */
+let gpaRows = store.get("gpaRows", [{g:"A",c:3},{g:"A-",c:3},{g:"B+",c:3},{g:"A+",c:3}]);
+function openGpa(){
+  const opts = g => Object.keys(OMSAS).map(k => `<option ${k === g ? "selected" : ""}>${k}</option>`).join("");
+  const calc = () => { let p = 0, c = 0; gpaRows.forEach(r => { if (r.c > 0){ p += OMSAS[r.g] * r.c; c += r.c; } }); return c ? p / c : 0; };
+  const draw = () => {
+    $("#sheetIn").innerHTML = `<div class="grab"></div><button class="closebtn" id="closeSheet">Close</button>
+      <div><span class="eyebrow">OMSAS 4.0 scale</span><h2 id="sheetTitle">GPA calculator</h2></div>
+      <div class="gpa-out"><span class="v num">${calc().toFixed(2)}</span><span class="t2">weighted by credits · ${gpaRows.reduce((a,r)=>a+(+r.c||0),0)} credits</span></div>
+      <div class="sec">${gpaRows.map((r,i) => `<div class="grow">
+        <select aria-label="Grade ${i+1}" data-i="${i}" data-k="g">${opts(r.g)}</select>
+        <input aria-label="Credits ${i+1}" type="number" inputmode="numeric" min="0" step="1" value="${r.c}" data-i="${i}" data-k="c">
+        <button class="iconbtn" data-del="${i}" aria-label="Remove course ${i+1}">−</button></div>`).join("")}</div>
+      <div class="btns"><button class="btn ghost" id="addRow">Add course</button><button class="btn" id="useGpa">Use this GPA</button></div>
+      <p class="foot">Grade values: A+ 4.0, A 3.9, A− 3.7, B+ 3.3, B 3.0, C+ 2.3, C 2.0, D+ 1.3, D 1.0, E/F 0. These were not checked against the official OUAC table row for uOttawa. Confirm at ouac.on.ca before you rely on the result.</p>`;
+    $("#closeSheet").onclick = closeSheet;
+    $("#addRow").onclick = () => { gpaRows.push({g:"A",c:3}); store.set("gpaRows", gpaRows); draw(); };
+    $("#useGpa").onclick = () => { $("#f-gpa").value = calc().toFixed(2); readProfile(); closeSheet(); };
+    $("#sheetIn").querySelectorAll("[data-i]").forEach(el => el.onchange = () => {
+      const r = gpaRows[+el.dataset.i]; r[el.dataset.k] = el.dataset.k === "c" ? Math.max(0, parseFloat(el.value) || 0) : el.value;
+      store.set("gpaRows", gpaRows); draw(); });
+    $("#sheetIn").querySelectorAll("[data-del]").forEach(el => el.onclick = () => { gpaRows.splice(+el.dataset.del, 1); store.set("gpaRows", gpaRows); draw(); });
+  };
+  draw();
+  $("#sheet").classList.add("open"); $("#scrim").classList.add("open");
+}
+
+/* ---------- plan ---------- */
+function renderChecklist(){
+  const done = CHECKLIST.filter(i => checks[i.id]).length;
+  $("#checkCount").textContent = `${done}/${CHECKLIST.length}`;
+  $("#checklist").innerHTML = CHECKLIST.map(i => `<label class="check${checks[i.id] ? " done" : ""}" for="c-${i.id}">
+    <input type="checkbox" id="c-${i.id}" data-c="${i.id}" ${checks[i.id] ? "checked" : ""}>
+    <span><div class="t1">${esc(i.t)}</div><div class="t2">${esc(i.s)}</div></span></label>`).join("");
+}
+function renderTimeline(){
+  $("#timeline").innerHTML = deadlineEvents().map(e => `<div class="row">
+    <div class="main"><div class="t1">${esc(e.s.short)} · ${esc(e.d.label)}</div>
+    <div class="t2">${fmt(e.date)}${e.projected ? " · projected" : ""} ${conf(e.d.confidence)}</div></div>
+    <div class="days"><div class="n num">${e.days}</div><div class="u">days</div></div></div>`).join("");
+}
+function renderResources(){
+  $("#resources").innerHTML = DATA.resources.map(r => {
+    const email = (r.note.match(/[\w.+-]+@[\w-]+\.[\w.]+/) || [])[0];
+    return `<div class="row"><div class="main"><div class="t1">${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.label)}</a>` : esc(r.label)}</div>
+      <div class="t2">${esc(email ? r.note.replace(email, "").replace(/:\s*$/, ":") : r.note)}</div>
+      ${email ? `<div class="copy" style="margin-top:6px"><code>${esc(email)}</code><button class="linkbtn" data-copy="${esc(email)}">Copy</button></div>` : ""}</div></div>`;
+  }).join("");
+}
+
+/* ---------- routing ---------- */
+const VIEWS = ["home","schools","fit","plan"];
+function go(v, push = true){
+  if (!VIEWS.includes(v)) v = "home";
+  document.querySelectorAll("[data-view]").forEach(s => s.hidden = s.dataset.view !== v);
+  document.querySelectorAll(".tab").forEach(t => { if (t.dataset.go === v) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current"); });
+  if (push && location.hash !== "#" + v) { try { history.replaceState(null, "", "#" + v); } catch { location.hash = v; } }
+  window.scrollTo(0, 0);
+}
+
+function renderAll(){
+  renderBanner(); renderArch(); renderNext(); fillProfile(); renderFitSnapshot(); renderFitResults();
+  renderChips(); renderSchools(); renderChecklist(); renderTimeline(); renderResources();
+}
+
+function bind(){
+  document.addEventListener("click", e => {
+    const g = e.target.closest("[data-go]"); if (g){ go(g.dataset.go); return; }
+    const c = e.target.closest("[data-f]"); if (c){ filter = c.dataset.f; store.set("filter", filter); renderChips(); renderSchools(); return; }
+    const s = e.target.closest(".school"); if (s){ openSchool(s.dataset.id); return; }
+    const cp = e.target.closest("[data-copy]"); if (cp){
+      const t = cp.dataset.copy;
+      const ok = () => { cp.textContent = "Copied"; setTimeout(() => cp.textContent = "Copy", 1500); };
+      try { navigator.clipboard.writeText(t).then(ok, () => selectNear(cp)); } catch { selectNear(cp); }
+    }
+  });
+  document.addEventListener("change", e => {
+    const c = e.target.closest("[data-c]");
+    if (c){ checks[c.dataset.c] = c.checked; store.set("checks", checks); renderChecklist(); renderArch(); }
+  });
+  ["#f-gpa","#f-aa","#f-pat","#f-entry","#f-casper","#f-french","#f-120","#f-qc"].forEach(id => $(id).addEventListener("change", readProfile));
+  $("#openGpa").onclick = openGpa;
+  $("#scrim").onclick = closeSheet;
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+  window.addEventListener("hashchange", () => go(location.hash.slice(1), false));
+}
+function selectNear(btn){ const code = btn.parentElement.querySelector("code"); const r = document.createRange(); r.selectNodeContents(code); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+async function boot(){
+  try {
+    const res = await fetch("schools.json", {cache:"no-cache"});
+    if (!res.ok) throw new Error(res.status);
+    DATA = await res.json();
+  } catch (err){
+    $("main").innerHTML = `<div class="banner"><p><b>School data did not load.</b> Open the app from its web address (not as a local file) so schools.json can be read.</p></div>`;
+    return;
+  }
+  bind(); renderAll(); go(location.hash.slice(1) || "home", false);
+  if ("serviceWorker" in navigator && location.protocol === "https:" && !/claude/.test(location.hostname)){
+    try { navigator.serviceWorker.register("sw.js"); } catch {}
+  }
+}
+boot();
+})();
+</script>
+</body>
+</html>

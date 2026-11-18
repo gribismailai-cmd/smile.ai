@@ -1,0 +1,277 @@
+{
+  "meta": {
+    "dataset": "Canadian DDS/DMD admissions, as seen by an Ontario-resident uOttawa applicant",
+    "researchedOn": "2026-11-18",
+    "method": "Web search of official faculty pages plus labelled third-party guides. Official pages could not be opened directly from the research environment; every value carries a confidence tag and must be confirmed on the linked source before a student relies on it.",
+    "confidenceScale": {
+      "official": "Stated on the school's own site (seen in search extract)",
+      "third-party": "From an admissions guide, forum, or aggregator, not the school",
+      "dated": "Official but from a previous cycle; may have changed",
+      "unknown": "Not found in research; must be verified"
+    },
+    "gpaScale": "OMSAS 4.0 scale",
+    "uOttawaNote": "The University of Ottawa does not offer a DDS/DMD program. uOttawa students apply to the faculties below."
+  },
+  "schools": [
+    {
+      "id": "uoft",
+      "name": "University of Toronto",
+      "short": "U of T",
+      "city": "Toronto", "province": "ON",
+      "degree": "DDS", "language": "English",
+      "ontarioStatus": "home",
+      "ontarioStatusNote": "Ontario residents apply as domestic applicants.",
+      "deadline": { "label": "Application", "month": 11, "day": 1, "year": null, "confidence": "dated", "note": "Nov 1 in 2021-22 Faculty calendar and tied to the official DAT rule." },
+      "otherDates": [
+        { "label": "Prerequisites completed", "month": 5, "day": 31, "year": null, "confidence": "official", "note": "By end of May of the entry year." }
+      ],
+      "gpaMin": 3.0, "gpaMinConfidence": "official",
+      "gpaCompetitive": 3.85, "gpaCompetitiveConfidence": "third-party", "gpaCompetitiveNote": "Typical GPA of interviewed domestic applicants (UTSC advising page, undated).",
+      "dat": { "required": true, "rule": "DAT taken within 24 months before the Nov 1 deadline.", "accepts": "CDA DAT (scores sent by testing agency, institution code 0982)", "minimum": null, "confidence": "official" },
+      "casper": { "required": true, "confidence": "official" },
+      "english": "English proficiency test within the same 24-month window (if applicable).",
+      "interview": "Interview (format not confirmed in research).",
+      "seats": 96, "seatsConfidence": "third-party",
+      "outOfProvinceSeats": null,
+      "applicationRoute": "UTDAS or AADSAS",
+      "sources": [
+        { "label": "U of T Faculty of Dentistry – DDS", "url": "https://www.dentistry.utoronto.ca/prospective-students/undergraduate-DDS", "tier": "official" },
+        { "label": "UTSC – What is Dentistry?", "url": "https://www.utsc.utoronto.ca/aacc/dentistry", "tier": "official" },
+        { "label": "Booster Prep – U of T", "url": "https://boosterprep.com/admissions/dentistry/dental-schools/university-of-toronto", "tier": "third-party" }
+      ]
+    },
+    {
+      "id": "western",
+      "name": "Western University (Schulich)",
+      "short": "Western",
+      "city": "London", "province": "ON",
+      "degree": "DDS", "language": "English",
+      "ontarioStatus": "home",
+      "ontarioStatusNote": "Ontario residents apply as domestic applicants.",
+      "deadline": { "label": "Application + DAT scores received", "month": 11, "day": 1, "year": null, "confidence": "official", "note": "DAT scores must reach Western by the Nov 1 deadline." },
+      "otherDates": [],
+      "gpaMin": 3.0, "gpaMinConfidence": "official",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "Cumulative GPA over all undergraduate courses; courses taken during the application cycle are not counted.",
+      "dat": { "required": true, "rule": "Only DAT versions that include Reading Comprehension are accepted.", "accepts": "DAT with Reading Comprehension", "minimum": null, "confidence": "official" },
+      "casper": { "required": true, "confidence": "official" },
+      "english": "Required for international applicants.",
+      "interview": "Up to 200 applicants invited to interview (format not confirmed).",
+      "seats": 56, "seatsConfidence": "official",
+      "applicantsPerYear": 700, "applicantsConfidence": "official",
+      "outOfProvinceSeats": null,
+      "applicationRoute": "Western online application",
+      "sources": [
+        { "label": "Schulich Dentistry – Admission requirements", "url": "https://schulich.uwo.ca/med_dent_admissions/dentistry/admission_requirements.html", "tier": "official" },
+        { "label": "Schulich Dentistry – FAQ", "url": "https://www.schulich.uwo.ca/med-dent-admissions/dentistry/frequently-asked-questions.html", "tier": "official" },
+        { "label": "Schulich Dentistry – How to apply", "url": "https://www.schulich.uwo.ca/med-dent-admissions/dentistry/how-to-apply.html", "tier": "official" }
+      ]
+    },
+    {
+      "id": "mcgill",
+      "name": "McGill University",
+      "short": "McGill",
+      "city": "Montréal", "province": "QC",
+      "degree": "DMD", "language": "English",
+      "ontarioStatus": "limited",
+      "ontarioStatusNote": "Out-of-province category. 2023 cycle: 1.81% out-of-province enrolment rate vs 5.97% for Quebec residents (third-party).",
+      "deadline": { "label": "Application", "month": 11, "day": 1, "year": null, "confidence": "unknown", "note": "Nov 1 confirmed for Quebec residents and the Black Candidate pathway; out-of-province date not confirmed." },
+      "otherDates": [
+        { "label": "120-credit bachelor's completed", "month": 7, "day": 31, "year": null, "confidence": "official", "note": "Non-Quebec Canadians must hold a 120-credit degree by July 31 of the entering year." }
+      ],
+      "gpaMin": null, "gpaMinConfidence": "unknown",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "",
+      "dat": { "required": false, "rule": "An older source says the DAT is not required or considered. Verify.", "accepts": "", "minimum": null, "confidence": "dated" },
+      "casper": { "required": true, "confidence": "official" },
+      "english": "",
+      "interview": "",
+      "seats": null, "seatsConfidence": "unknown",
+      "outOfProvinceSeats": null,
+      "requires120Credits": true,
+      "applicationRoute": "McGill online application",
+      "sources": [
+        { "label": "McGill – DMD requirements", "url": "https://www.mcgill.ca/dentistry/4-year-dmd-program/requirements", "tier": "official" },
+        { "label": "McGill – Applicant categories", "url": "https://www.mcgill.ca/dentistry/4-year-dmd-program/applicant-categories", "tier": "official" },
+        { "label": "Booster Prep – McGill", "url": "https://boosterprep.com/admissions/dentistry/dental-schools/mcgill-university", "tier": "third-party" }
+      ]
+    },
+    {
+      "id": "udem",
+      "name": "Université de Montréal",
+      "short": "UdeM",
+      "city": "Montréal", "province": "QC",
+      "degree": "DMD", "language": "French",
+      "ontarioStatus": "limited",
+      "ontarioStatusNote": "French-language program. Out-of-Quebec applicants have a separate, earlier deadline. Full eligibility rules not confirmed.",
+      "deadline": { "label": "Application (studied outside Quebec)", "month": 11, "day": 15, "year": 2026, "confidence": "official", "note": "Nov 15, 2026 for Fall 2027 entry; applications open Aug 1, 2026." },
+      "otherDates": [],
+      "gpaMin": null, "gpaMinConfidence": "unknown",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "",
+      "dat": { "required": null, "rule": "Not confirmed in research.", "accepts": "", "minimum": null, "confidence": "unknown" },
+      "casper": { "required": null, "confidence": "unknown" },
+      "english": "",
+      "interview": "",
+      "seats": null, "seatsConfidence": "unknown",
+      "outOfProvinceSeats": null,
+      "requiresFrench": true,
+      "applicationRoute": "UdeM admission portal",
+      "sources": [
+        { "label": "UdeM – Doctorat en médecine dentaire", "url": "https://admission.umontreal.ca/redirection/programme_id/130010/", "tier": "official" }
+      ]
+    },
+    {
+      "id": "laval",
+      "name": "Université Laval",
+      "short": "Laval",
+      "city": "Québec City", "province": "QC",
+      "degree": "DMD", "language": "French",
+      "ontarioStatus": "not-eligible",
+      "ontarioStatusNote": "Seats reserved for Canadian citizens / PRs who also hold Quebec resident status. Ontario residents do not qualify.",
+      "deadline": null,
+      "otherDates": [],
+      "gpaMin": null, "gpaMinConfidence": "unknown",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "",
+      "dat": { "required": null, "rule": "", "accepts": "", "minimum": null, "confidence": "unknown" },
+      "casper": { "required": null, "confidence": "unknown" },
+      "english": "", "interview": "",
+      "seats": 48, "seatsConfidence": "official",
+      "outOfProvinceSeats": 0,
+      "requiresFrench": true,
+      "applicationRoute": "Laval admission portal",
+      "sources": [
+        { "label": "Laval – 2027-2028 limited enrolment programs", "url": "https://www.dc.ulaval.ca/en/admission/prepare-your-application/limited-enrolment-programs/2027-2028-limited-enrolment-programs", "tier": "official" }
+      ]
+    },
+    {
+      "id": "ubc",
+      "name": "University of British Columbia",
+      "short": "UBC",
+      "city": "Vancouver", "province": "BC",
+      "degree": "DMD", "language": "English",
+      "ontarioStatus": "limited",
+      "ontarioStatusNote": "Accepts out-of-province applicants; out-of-province minimum average not found.",
+      "deadline": { "label": "Application", "month": 10, "day": 10, "year": 2026, "confidence": "official", "note": "Class of 2031 (Fall 2027 entry)." },
+      "otherDates": [
+        { "label": "DAT written by", "month": 8, "day": 31, "year": 2026, "confidence": "official", "note": "Canadian or American DAT; score valid 4 years before this date." },
+        { "label": "Documents received", "month": 10, "day": 23, "year": 2026, "confidence": "official", "note": "" }
+      ],
+      "gpaMin": null, "gpaMinConfidence": "unknown",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "General minimum academic standing of 70% (UBC FAQ).",
+      "dat": { "required": true, "rule": "Canadian or American DAT, written by the DAT deadline; valid 4 years.", "accepts": "CDA or ADA DAT", "minimum": null, "confidence": "official" },
+      "casper": { "required": false, "confidence": "dated" },
+      "english": "", "interview": "",
+      "seats": null, "seatsConfidence": "unknown",
+      "outOfProvinceSeats": null,
+      "applicationRoute": "UBC Faculty of Dentistry application",
+      "sources": [
+        { "label": "UBC – Applying to the DMD program", "url": "https://www.dentistry.ubc.ca/dmd/", "tier": "official" },
+        { "label": "UBC – DMD FAQ", "url": "https://www.dentistry.ubc.ca/education/dmd/dmd-faq/", "tier": "official" }
+      ]
+    },
+    {
+      "id": "ualberta",
+      "name": "University of Alberta",
+      "short": "Alberta",
+      "city": "Edmonton", "province": "AB",
+      "degree": "DDS", "language": "English",
+      "ontarioStatus": "limited",
+      "ontarioStatusNote": "Up to 3 of 32 seats for non-Alberta residents (2025 tip sheet; 2027 quota not confirmed).",
+      "deadline": { "label": "Application (11:59 p.m. MT)", "month": 11, "day": 1, "year": null, "confidence": "official", "note": "Applications open July 1." },
+      "otherDates": [
+        { "label": "Applications open", "month": 7, "day": 1, "year": null, "confidence": "official", "note": "" },
+        { "label": "DAT results received", "month": 1, "day": 15, "year": null, "confidence": "official", "note": "Write the DAT by early December so results arrive by Jan 15." }
+      ],
+      "gpaMin": null, "gpaMinConfidence": "unknown",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "",
+      "dat": { "required": true, "rule": "Canadian DAT only; U.S. DAT not accepted.", "accepts": "CDA DAT only", "minimum": null, "confidence": "official" },
+      "casper": { "required": null, "confidence": "unknown" },
+      "english": "",
+      "interview": "New in-person Pre-Entry Examination (details on school site).",
+      "seats": 32, "seatsConfidence": "dated",
+      "outOfProvinceSeats": 3,
+      "applicationRoute": "UAlberta application",
+      "sources": [
+        { "label": "UAlberta – DDS program", "url": "https://www.ualberta.ca/en/school-of-dentistry/programs-and-admissions/dentistry/dds-doctor-of-dental-surgery.html", "tier": "official" },
+        { "label": "UAlberta – 2027 DDS admissions checklist (PDF)", "url": "https://www.ualberta.ca/en/school-of-dentistry/programs-and-admissions/dentistry/2027-doctor-of-dental-surgery-admissions-checklist.pdf", "tier": "official" },
+        { "label": "UAlberta – DDS deadlines", "url": "https://ualberta.ca/school-of-dentistry/programs-and-admissions/dentistry/dds-admissions-deadlines.html", "tier": "official" }
+      ]
+    },
+    {
+      "id": "usask",
+      "name": "University of Saskatchewan",
+      "short": "USask",
+      "city": "Saskatoon", "province": "SK",
+      "degree": "DMD", "language": "English",
+      "ontarioStatus": "limited",
+      "ontarioStatusNote": "Large out-of-province pool: 187 of 274 applications in 2024/25. Higher DAT cut-off for out-of-province applicants.",
+      "deadline": { "label": "Application", "month": null, "day": null, "year": null, "confidence": "unknown", "note": "Deadline not found in research." },
+      "otherDates": [],
+      "gpaMin": null, "gpaMinConfidence": "unknown",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "",
+      "dat": { "required": true, "rule": "Minimum DAT average (USask's own calculation). Out-of-province: 23.89 (2026), 23.11 (2025), 22.56 (2024). Saskatchewan residents: 21.88 (2026).", "accepts": "", "minimum": 23.89, "minimumIsApprox": true, "confidence": "official" },
+      "casper": { "required": null, "confidence": "unknown" },
+      "english": "Proof of English proficiency if English is not the primary language.",
+      "interview": "",
+      "seats": null, "seatsConfidence": "unknown",
+      "applicantsPerYear": 274, "applicantsConfidence": "official",
+      "outOfProvinceSeats": null,
+      "applicationRoute": "USask admissions",
+      "sources": [
+        { "label": "USask – Dentistry admissions", "url": "https://admissions.usask.ca/dentistry.php", "tier": "official" },
+        { "label": "USask – Dentistry stats 2024-25 (PDF)", "url": "https://admissions.usask.ca/documents/dentistry-stats-2024-25.pdf", "tier": "official" }
+      ]
+    },
+    {
+      "id": "umanitoba",
+      "name": "University of Manitoba",
+      "short": "Manitoba",
+      "city": "Winnipeg", "province": "MB",
+      "degree": "DMD", "language": "English",
+      "ontarioStatus": "limited",
+      "ontarioStatusNote": "Out-of-province applicants considered; reported DAT cut-offs higher than for Manitobans (2018-2020, third-party).",
+      "deadline": { "label": "Application", "month": null, "day": null, "year": null, "confidence": "unknown", "note": "Deadline not found in research." },
+      "otherDates": [],
+      "gpaMin": null, "gpaMinConfidence": "unknown",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "",
+      "dat": { "required": true, "rule": "Out-of-province DAT cut-offs reported at 22.50 (2020), 21.75 (2019). Reference only.", "accepts": "", "minimum": null, "reference": 22.5, "confidence": "third-party" },
+      "casper": { "required": null, "confidence": "unknown" },
+      "english": "", "interview": "",
+      "seats": null, "seatsConfidence": "unknown",
+      "outOfProvinceSeats": null,
+      "applicationRoute": "UManitoba admissions",
+      "sources": [
+        { "label": "UManitoba – Dentistry prerequisites", "url": "https://umanitoba.ca/dentistry/prospective_students/dent_preReq.html", "tier": "official" },
+        { "label": "masterstudent.ca – Manitoba", "url": "https://masterstudent.ca/?p=333", "tier": "third-party" }
+      ]
+    },
+    {
+      "id": "dal",
+      "name": "Dalhousie University",
+      "short": "Dalhousie",
+      "city": "Halifax", "province": "NS",
+      "degree": "DDS", "language": "English",
+      "ontarioStatus": "limited",
+      "ontarioStatusNote": "Preference to Atlantic-province residents.",
+      "deadline": { "label": "Application + DAT + documents", "month": 10, "day": 1, "year": null, "confidence": "dated", "note": "Oct 1 in the Sept 2025 fact sheet; Fall 2027 dates not yet confirmed." },
+      "otherDates": [
+        { "label": "Prerequisites completed", "month": 5, "day": 1, "year": null, "confidence": "official", "note": "" }
+      ],
+      "gpaMin": null, "gpaMinConfidence": "unknown",
+      "gpaCompetitive": null, "gpaCompetitiveConfidence": "unknown", "gpaCompetitiveNote": "",
+      "dat": { "required": true, "rule": "Canadian residents submit the CDA DAT (third-party: highest score in last 3 years).", "accepts": "CDA DAT", "minimum": null, "confidence": "official" },
+      "casper": { "required": null, "confidence": "unknown" },
+      "english": "", "interview": "",
+      "seats": 46, "seatsConfidence": "official",
+      "outOfProvinceSeats": null,
+      "applicationRoute": "AADSAS or Dalhousie portal",
+      "sources": [
+        { "label": "Dalhousie – DDS program", "url": "https://www.dal.ca/study/programs/graduate-professional/dentistry-dds.html", "tier": "official" },
+        { "label": "Dalhousie – DDS fact sheet Sept 2025 (PDF)", "url": "https://cdn.dal.ca/content/dam/dalhousie/pdf/dentistry/DENT-DDS-Fact-sheet-Sept-2025.pdf", "tier": "official" }
+      ]
+    }
+  ],
+  "resources": [
+    { "label": "Canadian Dental Association – DAT", "url": "https://www.cda-adc.ca/for-prospective-dentists/dat", "note": "Canadian DAT is run year-round at Prometric centres. Registering for the DAT is not an application to any school." },
+    { "label": "OUAC – OMSAS GPA calculation", "url": "https://www.ouac.on.ca/guide/omsas-gpa-calculations/", "note": "Official Undergraduate Grade Conversion Table." },
+    { "label": "uOttawa Pre-Dental Club", "url": "", "note": "Student club. Contact listed publicly: uopredentalclub@gmail.com" }
+  ]
+}
