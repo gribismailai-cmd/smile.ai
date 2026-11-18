@@ -3,60 +3,320 @@
   "$id": "dentpath/school.schema.json",
   "title": "DentPath school record (v2)",
   "type": "object",
-  "required": ["id", "name", "country", "region", "degree", "language", "status", "fields", "sources"],
+  "required": [
+    "id",
+    "name",
+    "country",
+    "region",
+    "degree",
+    "language",
+    "status",
+    "fields",
+    "sources"
+  ],
   "properties": {
-    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-    "name": { "type": "string" },
-    "short": { "type": "string" },
-    "country": { "enum": ["CA", "US", "UK", "AU", "IE"] },
-    "region": { "type": "string", "description": "Province, state, nation or county" },
-    "city": { "type": "string" },
-    "degree": { "enum": ["DDS", "DMD", "BDS", "BChD", "BDSc", "BDentSc", "Other"] },
-    "language": { "enum": ["English", "French"] },
-    "status": { "enum": ["verified", "coming-soon"], "description": "coming-soon hides all requirement values in the app" },
-    "applicationSystem": { "enum": ["direct", "AADSAS", "UCAS", "other"] },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "short": {
+      "type": "string"
+    },
+    "country": {
+      "enum": [
+        "CA",
+        "US",
+        "UK",
+        "AU",
+        "IE"
+      ]
+    },
+    "region": {
+      "type": "string",
+      "description": "Province, state, nation or county"
+    },
+    "city": {
+      "type": "string"
+    },
+    "degree": {
+      "enum": [
+        "DDS",
+        "DMD",
+        "BDS",
+        "BChD",
+        "BDSc",
+        "BDentSc",
+        "Other"
+      ]
+    },
+    "language": {
+      "enum": [
+        "English",
+        "French"
+      ]
+    },
+    "status": {
+      "enum": [
+        "verified",
+        "draft",
+        "coming-soon"
+      ],
+      "description": "coming-soon hides all requirement values in the app"
+    },
+    "applicationSystem": {
+      "enum": [
+        "direct",
+        "AADSAS",
+        "UCAS",
+        "other"
+      ]
+    },
     "fields": {
       "type": "object",
       "description": "Every requirement value carries its own provenance",
       "properties": {
-        "deadline": { "$ref": "#/$defs/dateField" },
-        "eligibilityForCanadians": { "$ref": "#/$defs/textField" },
-        "gpaMinimum": { "$ref": "#/$defs/numberField" },
-        "gpaCompetitive": { "$ref": "#/$defs/numberField" },
-        "tests": { "$ref": "#/$defs/textField" },
-        "testMinimum": { "$ref": "#/$defs/numberField" },
-        "casper": { "$ref": "#/$defs/boolField" },
-        "prerequisites": { "$ref": "#/$defs/textField" },
-        "seatsTotal": { "$ref": "#/$defs/numberField" },
-        "seatsForCanadians": { "$ref": "#/$defs/numberField" },
-        "tuitionInternational": { "$ref": "#/$defs/textField" },
-        "interview": { "$ref": "#/$defs/textField" }
+        "deadline": {
+          "$ref": "#/$defs/dateField"
+        },
+        "eligibilityForCanadians": {
+          "$ref": "#/$defs/textField"
+        },
+        "gpaMinimum": {
+          "$ref": "#/$defs/numberField"
+        },
+        "gpaCompetitive": {
+          "$ref": "#/$defs/numberField"
+        },
+        "tests": {
+          "$ref": "#/$defs/textField"
+        },
+        "testMinimum": {
+          "$ref": "#/$defs/numberField"
+        },
+        "casper": {
+          "$ref": "#/$defs/boolField"
+        },
+        "prerequisites": {
+          "$ref": "#/$defs/textField"
+        },
+        "seatsTotal": {
+          "$ref": "#/$defs/numberField"
+        },
+        "tuitionInternational": {
+          "$ref": "#/$defs/textField"
+        },
+        "interview": {
+          "$ref": "#/$defs/textField"
+        },
+        "datRequired": {
+          "$ref": "#/$defs/boolField"
+        },
+        "testReference": {
+          "$ref": "#/$defs/numberField"
+        },
+        "seatsForOutOfProvince": {
+          "$ref": "#/$defs/numberField"
+        }
       },
       "additionalProperties": false
     },
-    "sources": { "type": "array", "items": { "$ref": "#/$defs/source" }, "minItems": 1 }
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      },
+      "minItems": 1
+    },
+    "applicationRoute": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "residencyRestrictedTo": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "Province/state codes; null = open to all Canadians"
+    },
+    "requires120Credits": {
+      "type": "boolean"
+    },
+    "applicantsPerYear": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "otherDates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dateField"
+      }
+    }
   },
   "$defs": {
     "provenance": {
       "type": "object",
-      "required": ["source_url", "checked_on", "confidence", "cycle"],
+      "required": [
+        "source_url",
+        "checked_on",
+        "confidence",
+        "cycle"
+      ],
       "properties": {
-        "source_url": { "type": "string", "format": "uri" },
-        "checked_on": { "type": "string", "format": "date" },
-        "checked_by": { "type": "string" },
-        "confidence": { "enum": ["official", "third-party", "dated", "unknown"] },
-        "cycle": { "type": "string", "pattern": "^Fall [0-9]{4}$" },
-        "note": { "type": "string" }
+        "source_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "checked_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "checked_by": {
+          "type": "string"
+        },
+        "confidence": {
+          "enum": [
+            "official",
+            "third-party",
+            "dated",
+            "unknown"
+          ]
+        },
+        "cycle": {
+          "type": "string",
+          "pattern": "^Fall [0-9]{4}$"
+        },
+        "note": {
+          "type": "string"
+        }
       }
     },
-    "textField": { "allOf": [{ "$ref": "#/$defs/provenance" }, { "properties": { "value": { "type": ["string", "null"] } }, "required": ["value"] }] },
-    "numberField": { "allOf": [{ "$ref": "#/$defs/provenance" }, { "properties": { "value": { "type": ["number", "null"] }, "scale": { "type": "string" } }, "required": ["value"] }] },
-    "boolField": { "allOf": [{ "$ref": "#/$defs/provenance" }, { "properties": { "value": { "type": ["boolean", "null"] } }, "required": ["value"] }] },
-    "dateField": { "allOf": [{ "$ref": "#/$defs/provenance" }, { "properties": { "value": { "type": ["string", "null"], "format": "date" }, "recurring": { "type": "boolean" } }, "required": ["value"] }] },
+    "textField": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/provenance"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "value"
+          ]
+        }
+      ]
+    },
+    "numberField": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/provenance"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "scale": {
+              "type": "string"
+            },
+            "approximate": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "value"
+          ]
+        }
+      ]
+    },
+    "boolField": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/provenance"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "value"
+          ]
+        }
+      ]
+    },
+    "dateField": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/provenance"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            },
+            "recurring": {
+              "type": "boolean"
+            },
+            "label": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value"
+          ]
+        }
+      ]
+    },
     "source": {
       "type": "object",
-      "required": ["label", "url", "tier"],
-      "properties": { "label": { "type": "string" }, "url": { "type": "string", "format": "uri" }, "tier": { "enum": ["official", "third-party"] } }
+      "required": [
+        "label",
+        "url",
+        "tier"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "tier": {
+          "enum": [
+            "official",
+            "third-party"
+          ]
+        }
+      }
     }
   }
 }

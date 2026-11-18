@@ -1,19 +1,35 @@
-# DentPath – dental school planner for uOttawa students (MVP)
+# DentPath – dental school planner for Canadian pre-dental students
 
 | Folder | What it is | State |
 |---|---|---|
-| `web/` | Touch-first web app (PWA). Add to iPhone home screen from Safari. | Working; tested at iPhone 13 size, light and dark |
-| `web/schools.json` | Requirements for all 10 Canadian DDS/DMD programs, each value tagged official / 3rd-party / prior cycle / unverified | Researched 2026-11-18 |
-| `ios/DentPath/` | Native SwiftUI source using the same JSON | Not compiled (no Xcode in build environment) |
-| `docs/PROJECT_PLAN.md` | PMI-style charter, WBS, risks, data gaps, phase 2 | — |
+| `web/` | The app (PWA): `index.html`, `logic.js`, `schools.json` (schema v2) | Beta. Canada: 10 schools as *draft* (unverified). US/UK/AU/IE: coming soon |
+| `web/schema/` | JSON Schema for school records | v2 |
+| `tests/` | Unit tests (`logic.test.js`) and UI tests (`ui.test.mjs`) | 21 + 16 passing |
+| `tools/` | Data validator, v1→v2 migration | — |
+| `ios/DentPath/` | SwiftUI source | Not compiled; still on schema v1, update after beta |
+| `docs/` | Master prompt, G0 charter, G1 plan, G2 report, legal drafts | — |
 
-Run locally:
+## Commands (from `dentapply/`)
 
 ```bash
-cd dentapply/web && python3 -m http.server 8000
-# open http://localhost:8000 (schools.json must be served, not opened as a file)
+npm test              # unit tests
+npm run test:ui       # UI tests (Playwright + Chromium)
+npm run validate      # schools.json vs schema
+npm run serve         # http://localhost:8000
 ```
 
-Install on iPhone: deploy `web/` to any HTTPS host, open in Safari → Share → Add to Home Screen.
+## Deploy on Vercel
 
-Not affiliated with the University of Ottawa or any dental faculty. Confirm every requirement on the school's own site.
+1. Vercel → Add New Project → import `gribismailai-cmd/smile.ai`.
+2. **Root Directory: `dentapply/web`**. Framework preset: Other. No build command, no output directory.
+3. Deploy. `web/vercel.json` sets no-cache on data and the service worker plus security headers.
+4. On iPhone: open the URL in Safari → Share → Add to Home Screen.
+
+## Releasing data
+
+1. Update `web/schools.json`; set a school's `status` to `verified` only when every Must field was checked on the official page this cycle.
+2. Run `npm run validate && npm test && npm run test:ui`.
+3. Bump `VERSION` in `web/sw.js` so installed copies fetch the new data.
+4. For launch, set `RELEASE_MODE = "launch"` in `web/index.html`: draft schools then show as "Coming soon".
+
+Independent project. Not affiliated with any university or dental faculty.
