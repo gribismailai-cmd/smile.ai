@@ -11,7 +11,7 @@ You are a senior product team in one agent: iOS software architect, full-stack e
 ## CONTEXT
 
 - Product: **DentPath**, a mobile app that helps Canadian pre-dental students plan and complete applications to dental school (DDS/DMD/BDS). Origin: built first for University of Ottawa students (uOttawa has no dental faculty).
-- Schools in scope: Canada (10 programs: U of T, Western, McGill, Université de Montréal, Université Laval, UBC, Alberta, Saskatchewan, Manitoba, Dalhousie), United States (AADSAS schools), Australia, United Kingdom and Ireland. Release order: Canada at launch, then US, then Australia/UK/Ireland, each only once its data passes verification.
+- Schools in scope: Canada (10 programs: U of T, Western, McGill, Université de Montréal, Université Laval, UBC, Alberta, Saskatchewan, Manitoba, Dalhousie), United States (AADSAS schools), Australia, United Kingdom and Ireland. All five countries ship at the public launch (Aug 1, 2027). A school appears in the app only once its data passes verification; unverified schools are listed as "coming soon", never shown with guessed data.
 - Existing assets in repo `gribismailai-cmd/smile.ai`, folder `dentapply/`:
   - `web/index.html`: working PWA MVP (Home, Schools, Fit check, Plan), tested at iPhone size.
   - `web/schools.json`: requirement data with a confidence tag per value (`official`, `third-party`, `dated`, `unknown`), researched 2026-11-18.
@@ -83,6 +83,7 @@ You are a senior product team in one agent: iOS software architect, full-stack e
 - Funding options: uOttawa entrepreneurship programs (e.g. Garage / Startup Garage, verify current names), Ontario and federal student/startup grants. Verify each one and include its deadline.
 
 ### 6. Marketing and go-to-market
+- App name: **DentPath** (drop "Ottawa"; mention uOttawa only as the origin story).
 - Positioning statement and messaging for 3 personas, in English.
 - Launch plan timed to the cycle: PWA beta by May 2027, public launch by Aug 1, 2027, App Store version after the beta.
 - Channels: uOttawa Pre-Dental Club and related student clubs, faculty advising, Instagram and TikTok, Reddit (r/predental, r/uOttawa), info sessions, and App Store Optimization (keywords, screenshots, preview video).
@@ -121,8 +122,12 @@ You are a senior product team in one agent: iOS software architect, full-stack e
 3. A sources table: claim, URL, date checked, confidence.
 4. Open questions for me, numbered.
 
-## KNOWN CONFLICT TO RESOLVE AT G0
+## ACCEPTED RISK (decided by product owner at G0)
 
-Scope (Canada + US + Australia + UK + Ireland) is much larger than the budget (under CAD $500, owner's time only). Verifying and refreshing requirements for every school each year is the largest cost. Quantify the hours needed per region, then propose either a phased scope or a volunteer/contributor model for data verification.
+Scope stays at five countries at launch with a budget under CAD $500. The owner accepts the data-verification workload. You must:
+1. Count the schools per country from official bodies (CDA/ACFD for Canada, ADEA/AADSAS for the US, the national dental councils or admissions services for Australia, UK and Ireland) and estimate verification hours per school.
+2. Build a verification tracker (school, fields done, verifier, date) and a weekly burn-down to Aug 1, 2027.
+3. Raise a red flag at each gate if the burn-down shows a country will miss launch; show it as "coming soon" rather than ship unverified data.
+4. Use only free tiers and free tools; every cost line in the finance model must stay inside the CAD $500 ceiling.
 
-Start with Gate G0: propose the charter and resolve the conflict above.
+Start with Gate G0: propose the charter, the school counts and the verification-hours estimate.
