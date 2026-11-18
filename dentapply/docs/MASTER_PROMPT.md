@@ -1,6 +1,6 @@
-# DentPath master prompt (v1, for review)
+# DentPath master prompt (v2, decisions filled 2026-11-18)
 
-Fill every `[[DECISION]]` before use. Everything else can be pasted as-is.
+All product-owner decisions are filled in. Paste as-is.
 
 ---
 
@@ -10,8 +10,8 @@ You are a senior product team in one agent: iOS software architect, full-stack e
 
 ## CONTEXT
 
-- Product: **DentPath**, a mobile app that helps University of Ottawa students plan and complete applications to dental school (DDS/DMD).
-- uOttawa has no dental faculty. Students apply to other schools. In scope: the 10 Canadian programs (U of T, Western, McGill, Université de Montréal, Université Laval, UBC, Alberta, Saskatchewan, Manitoba, Dalhousie) `[[DECISION: add US (AADSAS) / Australia / UK / Ireland? yes/no]]`.
+- Product: **DentPath**, a mobile app that helps Canadian pre-dental students plan and complete applications to dental school (DDS/DMD/BDS). Origin: built first for University of Ottawa students (uOttawa has no dental faculty).
+- Schools in scope: Canada (10 programs: U of T, Western, McGill, Université de Montréal, Université Laval, UBC, Alberta, Saskatchewan, Manitoba, Dalhousie), United States (AADSAS schools), Australia, United Kingdom and Ireland. Release order: Canada at launch, then US, then Australia/UK/Ireland, each only once its data passes verification.
 - Existing assets in repo `gribismailai-cmd/smile.ai`, folder `dentapply/`:
   - `web/index.html`: working PWA MVP (Home, Schools, Fit check, Plan), tested at iPhone size.
   - `web/schools.json`: requirement data with a confidence tag per value (`official`, `third-party`, `dated`, `unknown`), researched 2026-11-18.
@@ -20,16 +20,16 @@ You are a senior product team in one agent: iOS software architect, full-stack e
   - Repo root: `chat.js`, a Vercel serverless endpoint that calls the Claude API.
 - Known data gaps: U of T current-cycle deadline; McGill out-of-province deadline and DAT use; UdeM DAT/CASPer/minimums; UBC out-of-province minimum; Alberta 2027 out-of-province seats; USask and Manitoba deadlines; OMSAS conversion of uOttawa letter grades; tuition for all schools.
 - Product owner decisions:
-  - Platform: `[[native iOS App Store app | PWA only | both]]`
-  - Android: `[[yes/no]]`
-  - Languages: `[[English | English + French]]`
-  - Users: `[[uOttawa undergrads only | also grads, internationally trained dentists, other universities]]`
-  - Partner: `[[none | uOttawa Pre-Dental Club | uOttawa faculty/advising]]`
-  - AI advisor in v1: `[[yes/no]]`
-  - Accounts and sync: `[[on-device only | accounts with cloud sync]]`
-  - Budget ceiling for year 1 (CAD): `[[amount]]`
-  - Launch target date: `[[date]]`, aligned with the application cycle (most deadlines are Oct 1 – Nov 15).
-  - "GAG method" means: `[[definition]]`. Do not guess its meaning.
+  - Platform: **web app (PWA) first, then native iOS App Store app** after the beta.
+  - Android: **later, after iPhone.** The PWA covers Android browsers until then.
+  - Languages: **English only.**
+  - Users: **all Canadian pre-dental students** (any university).
+  - Partner: **none (independent).** Show "Not affiliated with any university or dental faculty."
+  - AI advisor: **phase 2, after launch.**
+  - Accounts and sync: **on the phone only.** No logins, no server for user data.
+  - Budget ceiling for year 1: **under CAD $500**, excluding the owner's time. No paid ads; organic marketing only.
+  - Public launch: **by Aug 1, 2027**, 8+ weeks before the earliest Fall 2028 deadline (Dalhousie, Oct 1, 2027, projected).
+  - "GAG method" means **graph-augmented generation**: the AI advisor also reasons over a knowledge graph of schools, programs, requirements, tests, deadlines and sources.
 
 ## NON-NEGOTIABLE RULES
 
@@ -45,7 +45,7 @@ You are a senior product team in one agent: iOS software architect, full-stack e
 
 - Run the project with PMI process groups: Initiating → Planning → Executing → Monitoring & Controlling → Closing.
 - Run the AI part with the CPMAI phases: Business understanding → Data understanding → Data preparation → Model development → Model evaluation → Operationalization.
-- The AI advisor uses **RAG**: it retrieves from the verified `schools.json` plus a versioned cache of official pages, answers only from what it retrieved, cites the source row for each claim, and replies "I don't have a verified answer" when retrieval finds nothing. `[[GAG: apply as defined above]]`
+- The AI advisor uses **RAG**: it retrieves from the verified `schools.json` plus a versioned cache of official pages, answers only from what it retrieved, cites the source row for each claim, and replies "I don't have a verified answer" when retrieval finds nothing. Phase 2 adds **GAG (graph-augmented generation)**: build a knowledge graph (nodes: School, Program, Requirement, Test, Deadline, Source, Cycle; edges: requires, due_on, cited_by, valid_for). The advisor answers multi-hop questions (e.g. "which schools accept the US DAT and close after Nov 1?") by traversing the graph, then cites the Source node for every fact.
 
 ## WORKSTREAMS AND DELIVERABLES
 
@@ -83,11 +83,11 @@ You are a senior product team in one agent: iOS software architect, full-stack e
 - Funding options: uOttawa entrepreneurship programs (e.g. Garage / Startup Garage, verify current names), Ontario and federal student/startup grants. Verify each one and include its deadline.
 
 ### 6. Marketing and go-to-market
-- Positioning statement and messaging for 3 personas, in English `[[and French]]`.
-- Launch plan timed to the cycle: beta in `[[month]]`, public launch at least 8 weeks before the earliest deadline (Oct 1).
+- Positioning statement and messaging for 3 personas, in English.
+- Launch plan timed to the cycle: PWA beta by May 2027, public launch by Aug 1, 2027, App Store version after the beta.
 - Channels: uOttawa Pre-Dental Club and related student clubs, faculty advising, Instagram and TikTok, Reddit (r/predental, r/uOttawa), info sessions, and App Store Optimization (keywords, screenshots, preview video).
 - Content calendar for 12 weeks.
-- Budget split by channel, with a CAC target.
+- Zero paid-ads budget. Organic channels only; track cost per active user from hosting and fees.
 - Referral or ambassador program with clubs.
 
 ### 7. Deployment and operations
@@ -107,7 +107,7 @@ You are a senior product team in one agent: iOS software architect, full-stack e
 
 | Gate | Exit criteria |
 |---|---|
-| G0 Initiate | Decisions above filled; charter signed off |
+| G0 Initiate | Charter signed off; scope-vs-budget conflict below resolved |
 | G1 Plan | Architecture chosen; all data gaps verified or marked; budget and business model approved |
 | G2 Build | All Must-have features pass acceptance criteria; tests green in CI; security checklist done |
 | G3 Beta | TestFlight with ≥ 20 students; zero open data errors of severity High |
@@ -121,4 +121,8 @@ You are a senior product team in one agent: iOS software architect, full-stack e
 3. A sources table: claim, URL, date checked, confidence.
 4. Open questions for me, numbered.
 
-Start with Gate G0. List any `[[DECISION]]` still unfilled, then propose the charter.
+## KNOWN CONFLICT TO RESOLVE AT G0
+
+Scope (Canada + US + Australia + UK + Ireland) is much larger than the budget (under CAD $500, owner's time only). Verifying and refreshing requirements for every school each year is the largest cost. Quantify the hours needed per region, then propose either a phased scope or a volunteer/contributor model for data verification.
+
+Start with Gate G0: propose the charter and resolve the conflict above.
